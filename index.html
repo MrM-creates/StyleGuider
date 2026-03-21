@@ -149,53 +149,52 @@
         <main class="canvas-wrapper">
           <header class="canvas-header">
             <p class="canvas-subtitle" id="step-context-text">Schritt 1: Wähle die passende Stilfamilie.</p>
-            <div class="canvas-header-actions">
-              <button class="info-btn" id="style-info-btn" aria-expanded="false" aria-controls="style-info-card" title="Stil-Info">
-                i
-              </button>
-            </div>
           </header>
-
-          <section class="style-info-card hidden" id="style-info-card" aria-live="polite">
-            <h3 id="info-style-name">Stilname</h3>
-            <p id="info-style-effect"></p>
-            <div class="info-grid">
-              <div>
-                <h4>Geeignet für</h4>
-                <p id="info-style-suitable"></p>
-              </div>
-              <div>
-                <h4>Weniger geeignet für</h4>
-                <p id="info-style-avoid"></p>
-              </div>
-              <div>
-                <h4>Empfohlen</h4>
-                <p id="info-style-dos"></p>
-              </div>
-              <div>
-                <h4>Vermeiden</h4>
-                <p id="info-style-donts"></p>
-              </div>
-              <div>
-                <h4>Hinweise Web</h4>
-                <p id="info-style-web"></p>
-              </div>
-              <div>
-                <h4>Hinweise Print</h4>
-                <p id="info-style-print"></p>
-              </div>
-              <div>
-                <h4>Typische Gefahr</h4>
-                <p id="info-style-risk"></p>
-              </div>
-            </div>
-          </section>
 
           <div class="preview-canvas channel-web" id="preview-canvas">
             <div class="sg-container">
               <div class="sg-header">
-                <h1 id="preview-brand-title">Marke / UI Titel</h1>
+                <div class="sg-header-title-row">
+                  <h1 id="preview-brand-title">Marke / UI Titel</h1>
+                  <button class="info-btn" id="style-info-btn" aria-expanded="false" aria-controls="style-info-card" title="Stil-Info">
+                    i
+                  </button>
+                </div>
                 <p id="preview-style-summary" class="preview-style-summary"></p>
+                <section class="style-info-card hidden" id="style-info-card" aria-live="polite">
+                  <h3 id="info-style-name">Stilname</h3>
+                  <p id="info-style-effect"></p>
+                  <div class="info-grid">
+                    <div>
+                      <h4>Geeignet für</h4>
+                      <p id="info-style-suitable"></p>
+                    </div>
+                    <div>
+                      <h4>Weniger geeignet für</h4>
+                      <p id="info-style-avoid"></p>
+                    </div>
+                    <div>
+                      <h4>Empfohlen</h4>
+                      <p id="info-style-dos"></p>
+                    </div>
+                    <div>
+                      <h4>Vermeiden</h4>
+                      <p id="info-style-donts"></p>
+                    </div>
+                    <div>
+                      <h4>Hinweise Web</h4>
+                      <p id="info-style-web"></p>
+                    </div>
+                    <div>
+                      <h4>Hinweise Print</h4>
+                      <p id="info-style-print"></p>
+                    </div>
+                    <div>
+                      <h4>Typische Gefahr</h4>
+                      <p id="info-style-risk"></p>
+                    </div>
+                  </div>
+                </section>
               </div>
 
               <div class="sg-grid">
@@ -321,6 +320,7 @@
             <button class="tab-btn" data-tab="json">Design-Tokens</button>
             <button class="tab-btn" data-tab="ai">KI-Agent Prompt</button>
             <button class="tab-btn" data-tab="image">Bild-KI Prompt</button>
+            <button class="tab-btn" data-tab="pdf">PDF (2 Seiten)</button>
           </div>
           <div class="modal-body">
             <div class="tab-content active" id="tab-css">
@@ -338,6 +338,13 @@
             <div class="tab-content" id="tab-image">
               <pre><code id="export-image-code"></code></pre>
               <button class="copy-btn" data-target="export-image-code">Kopieren</button>
+            </div>
+            <div class="tab-content" id="tab-pdf">
+              <p class="pdf-tab-copy">Exportiert ein 2-seitiges PDF mit Stilbeschreibung (Seite 1) und kanalspezifischen Spezifikationen (Seite 2).</p>
+              <div class="pdf-export-actions">
+                <button class="step-primary-btn pdf-export-btn" id="export-pdf-web">PDF Export Web (2 Seiten)</button>
+                <button class="step-primary-btn pdf-export-btn" id="export-pdf-print">PDF Export Print (2 Seiten)</button>
+              </div>
             </div>
           </div>
         </div>
