@@ -568,7 +568,11 @@ function initUI() {
 
   stepBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
-      setStep(btn.dataset.step);
+      const stepId = btn.dataset.step;
+      setStep(stepId);
+      if (stepId === 'export') {
+        exportStylePdf(currentChannel);
+      }
     });
   });
 
@@ -611,7 +615,8 @@ if (styleInfoBtn && styleInfoCard) {
   });
 }
 
-const exportBtns = [document.getElementById('export-btn')].filter(Boolean);
+const directExportBtn = document.getElementById('export-btn');
+const advancedExportBtn = document.getElementById('advanced-export-btn');
 const exportModal = document.getElementById('export-modal');
 const closeModalBtn = document.getElementById('close-modal');
 const tabBtns = document.querySelectorAll('.tab-btn');
@@ -764,20 +769,52 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
     .map(([key]) => prettifyKey(key))
     .join(', ');
 
+  const colorSwatches = [
+    ['Hintergrund', live.background],
+    ['Fläche', live.surface],
+    ['Text primär', live.text_primary],
+    ['Text sekundär', live.text_secondary],
+    ['Primär', live.primary],
+    ['Akzent', live.accent]
+  ]
+    .map(
+      ([label, value]) =>
+        `<div class="swatch-item"><div class="swatch-dot" style="background:${escapeHtml(value)};"></div><div><span>${escapeHtml(
+          label
+        )}</span><strong>${escapeHtml(value)}</strong></div></div>`
+    )
+    .join('');
+
   return `<!doctype html>
 <html lang="de">
   <head>
     <meta charset="utf-8" />
     <title>StyleGuider Export - ${escapeHtml(styleObj.style_family.name)} (${escapeHtml(channelData.label)})</title>
     <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
       @page { size: A4; margin: 14mm; }
-      * { box-sizing: border-box; }
+      :root {
+        --pdf-bg-main: ${live.background};
+        --pdf-surface: ${live.surface};
+        --pdf-text-dark: ${live.text_primary};
+        --pdf-text-main: ${live.text_secondary};
+        --pdf-primary: ${live.primary};
+        --pdf-accent: ${live.accent};
+        --pdf-font-heading: ${live.heading_font};
+        --pdf-font-body: ${live.body_font};
+        --pdf-radius-md: ${live.radius_md};
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
       body {
         margin: 0;
-        font-family: Inter, Arial, sans-serif;
-        color: #111827;
+        font-family: var(--pdf-font-body), Inter, Arial, sans-serif;
+        color: var(--pdf-text-main);
         line-height: 1.45;
-        background: #ffffff;
+        background: var(--pdf-bg-main);
       }
       .pdf-page {
         page-break-after: always;
@@ -786,7 +823,7 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
         page-break-after: auto;
       }
       .pdf-header {
-        border-bottom: 2px solid #d1d5db;
+        border-bottom: 2px solid var(--pdf-primary);
         padding-bottom: 10px;
         margin-bottom: 16px;
       }
@@ -801,6 +838,8 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
         margin: 0;
         font-size: 26px;
         line-height: 1.2;
+        color: var(--pdf-text-dark);
+        font-family: var(--pdf-font-heading), Inter, Arial, sans-serif;
       }
       .pdf-meta {
         margin: 8px 0 0;
@@ -813,9 +852,10 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
         gap: 10px;
       }
       .pdf-card {
-        border: 1px solid #d1d5db;
+        border: 1px solid #cfd8e3;
         border-radius: 10px;
         padding: 10px 12px;
+        background: var(--pdf-surface);
       }
       .pdf-card.full {
         grid-column: 1 / -1;
@@ -848,6 +888,7 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
       }
       .pdf-list strong {
         font-weight: 600;
+        color: var(--pdf-text-dark);
       }
       .pdf-empty {
         font-size: 12px;
@@ -855,6 +896,72 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
       }
       .pdf-note {
         margin-top: 8px;
+        font-size: 12px;
+      }
+      .swatch-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .swatch-item {
+        display: grid;
+        grid-template-columns: 24px 1fr;
+        align-items: center;
+        gap: 8px;
+      }
+      .swatch-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1px solid rgba(0, 0, 0, 0.25);
+      }
+      .swatch-item span,
+      .swatch-item strong {
+        display: block;
+        font-size: 11px;
+      }
+      .swatch-item span {
+        color: #4b5563;
+      }
+      .type-preview h3 {
+        margin: 0;
+        font-family: var(--pdf-font-heading), Inter, Arial, sans-serif;
+        color: var(--pdf-text-dark);
+        font-size: 24px;
+      }
+      .type-preview p {
+        margin: 8px 0 0;
+        font-family: var(--pdf-font-body), Inter, Arial, sans-serif;
+      }
+      .component-row {
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .preview-btn {
+        border: 0;
+        border-radius: var(--pdf-radius-md);
+        padding: 8px 14px;
+        font-weight: 600;
+        font-family: var(--pdf-font-body), Inter, Arial, sans-serif;
+      }
+      .preview-btn.primary {
+        background: var(--pdf-primary);
+        color: #ffffff;
+      }
+      .preview-btn.secondary {
+        background: var(--pdf-surface);
+        color: var(--pdf-text-dark);
+        border: 1px solid #b5c1cf;
+      }
+      .preview-input {
+        min-width: 180px;
+        padding: 8px 10px;
+        border-radius: var(--pdf-radius-md);
+        border: 1px solid #b5c1cf;
+        color: var(--pdf-text-main);
         font-size: 12px;
       }
     </style>
@@ -925,6 +1032,19 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
           <h2>Aktuelle Attribute (Live-Zustand)</h2>
           ${objectListHtml(liveTokenMap)}
         </article>
+        <article class="pdf-card full">
+          <h2>Visuelle Vorschau mit Live-Attributen</h2>
+          <div class="swatch-grid">${colorSwatches}</div>
+          <div class="type-preview">
+            <h3>Typografie Vorschau</h3>
+            <p>Zwölf Boxkämpfer jagen Eva quer durch Sylt. Lesbarkeit und Tonalität entsprechen den gewählten Attributen.</p>
+          </div>
+          <div class="component-row">
+            <button class="preview-btn primary" type="button">Primäre Aktion</button>
+            <button class="preview-btn secondary" type="button">Sekundär</button>
+            <input class="preview-input" type="text" value="Eingabe-Beispiel" />
+          </div>
+        </article>
         <article class="pdf-card">
           <h2>Governance</h2>
           ${objectListHtml(governanceMap)}
@@ -946,31 +1066,41 @@ function exportStylePdf(targetChannel) {
     if (!currentStyleObj) return;
 
     const markup = buildPdfExportMarkup(currentStyleObj, targetChannel);
-    const htmlBlob = new Blob([markup], { type: 'text/html' });
-    const blobUrl = URL.createObjectURL(htmlBlob);
-    const printWindow = window.open(blobUrl, '_blank', 'noopener,noreferrer,width=1100,height=900');
-
-    if (!printWindow) {
-      URL.revokeObjectURL(blobUrl);
-      alert('Bitte Popups erlauben, damit der PDF-Export gestartet werden kann.');
-      return;
-    }
-
-    const revokeBlobUrl = () => {
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
-    };
+    const printFrame = document.createElement('iframe');
+    printFrame.setAttribute('aria-hidden', 'true');
+    printFrame.style.position = 'fixed';
+    printFrame.style.right = '0';
+    printFrame.style.bottom = '0';
+    printFrame.style.width = '0';
+    printFrame.style.height = '0';
+    printFrame.style.border = '0';
+    document.body.appendChild(printFrame);
 
     let printed = false;
     const triggerPrint = () => {
       if (printed) return;
       printed = true;
-      printWindow.focus();
-      printWindow.print();
-      revokeBlobUrl();
+      const frameWindow = printFrame.contentWindow;
+      if (!frameWindow) return;
+      frameWindow.focus();
+      frameWindow.print();
+      setTimeout(() => {
+        printFrame.remove();
+      }, 1500);
     };
 
-    printWindow.addEventListener('load', () => setTimeout(triggerPrint, 120), { once: true });
-    setTimeout(triggerPrint, 1200);
+    const frameDocument = printFrame.contentDocument;
+    if (!frameDocument) {
+      printFrame.remove();
+      alert('PDF Export konnte nicht vorbereitet werden.');
+      return;
+    }
+
+    printFrame.addEventListener('load', () => setTimeout(triggerPrint, 100), { once: true });
+    frameDocument.open();
+    frameDocument.write(markup);
+    frameDocument.close();
+    setTimeout(triggerPrint, 600);
   } catch (err) {
     console.error('PDF Export failed:', err);
     alert('PDF Export fehlgeschlagen. Bitte versuche es erneut.');
@@ -986,9 +1116,15 @@ function closeModal() {
   exportModal.classList.add('hidden');
 }
 
-exportBtns.forEach((btn) => {
-  btn.addEventListener('click', openModal);
-});
+if (directExportBtn) {
+  directExportBtn.addEventListener('click', () => {
+    exportStylePdf(currentChannel);
+  });
+}
+
+if (advancedExportBtn) {
+  advancedExportBtn.addEventListener('click', openModal);
+}
 
 closeModalBtn.addEventListener('click', closeModal);
 
