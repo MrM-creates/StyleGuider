@@ -1,23 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StyleGuider | Design System Generator</title>
+    <title>StyleGuider | Design-System Generator</title>
   </head>
   <body>
     <div id="app">
       <header class="global-header">
         <div class="brand-block">
-          <span class="eyebrow">StyleGuider fuer Designer & Entwickler</span>
+          <span class="eyebrow">StyleGuider für Designer & Entwickler</span>
           <h1>Erstelle dein Brand-System in 3 klaren Schritten</h1>
         </div>
         <div class="header-actions">
-          <span class="status-chip">
-            <span class="status-dot"></span>
-            Live Preview aktiv
-          </span>
-          <button class="export-btn" id="export-btn-header">Export oeffnen</button>
+          <span class="header-note">Design-System Generator</span>
         </div>
       </header>
 
@@ -25,14 +21,14 @@
         <aside class="sidebar">
           <div class="sidebar-intro">
             <p>
-              Du waehlst eine Stilfamilie, passt Tokens an und exportierst alles fuer Web & Print.
+              Du wählst eine Stilfamilie, passt Tokens an und exportierst alles für Web & Print.
             </p>
           </div>
 
-          <nav class="stepper-nav" aria-label="Schritt Navigation">
+          <nav class="stepper-nav" aria-label="Schritt-Navigation">
             <button class="step-btn active" data-step="style" aria-current="step">
               <span class="step-index">1</span>
-              Stil waehlen
+              Stil wählen
             </button>
             <button class="step-btn" data-step="tokens">
               <span class="step-index">2</span>
@@ -47,17 +43,17 @@
           <div class="sidebar-content">
             <section class="step-panel active" data-step-panel="style">
               <div class="control-group">
-                <span class="control-label">Design Preset</span>
-                <label for="style-presets-select" class="sr-only">Style Preset auswaehlen</label>
+                <span class="control-label">Stilfamilie</span>
+                <label for="style-presets-select" class="sr-only">Stil auswählen</label>
                 <select id="style-presets-select" class="fs-input" aria-describedby="style-help"></select>
                 <p id="style-help" class="control-help">
-                  Das Preset setzt Farbe, Typografie und Grundform fuer deine Marke.
+                  Das Preset setzt Farben, Typografie und Grundform für deine Marke.
                 </p>
               </div>
 
               <div class="control-group">
-                <span class="control-label">Channel Context</span>
-                <div id="channel-presets-container" class="channel-toggle" role="group" aria-label="Channel waehlen">
+                <span class="control-label">Kanal</span>
+                <div id="channel-presets-container" class="channel-toggle" role="group" aria-label="Kanal wählen">
                   <button class="theme-btn active" data-channel="web">Web</button>
                   <button class="theme-btn" data-channel="print">Print</button>
                 </div>
@@ -68,36 +64,39 @@
 
             <section class="step-panel" data-step-panel="tokens">
               <div class="control-group">
-                <span class="control-label">Core Colors</span>
+                <span class="control-label">Kernfarben</span>
                 <div class="token-input-group">
-                  <label for="bg-color">Background</label>
+                  <label for="bg-color">Hintergrund</label>
                   <input type="color" id="bg-color" value="#FFFCF9" data-var="--pv-bg-main" />
                 </div>
                 <div class="token-input-group">
-                  <label for="surface-color">Surface</label>
+                  <label for="surface-color">Fläche</label>
                   <input type="color" id="surface-color" value="#FFFFFF" data-var="--pv-surface" />
                 </div>
                 <div class="token-input-group">
-                  <label for="primary-color">Primary</label>
+                  <label for="primary-color">Primär</label>
                   <input type="color" id="primary-color" value="#f5a8a0" data-var="--pv-color-1" />
                 </div>
                 <div class="token-input-group">
-                  <label for="secondary-color">Secondary</label>
+                  <label for="secondary-color">Sekundär</label>
                   <input type="color" id="secondary-color" value="#a8d7d8" data-var="--pv-color-2" />
                 </div>
                 <div class="token-input-group">
-                  <label for="text-dark-color">Text Dark</label>
+                  <label for="text-dark-color">Text dunkel</label>
                   <input type="color" id="text-dark-color" value="#3a3a3a" data-var="--pv-text-dark" />
                 </div>
+                <p class="control-help">
+                  Token-Anpassung ist Feintuning: So bleibt die Stilidentität erhalten.
+                </p>
               </div>
 
               <details class="advanced-accordion">
-                <summary>Typography & Form</summary>
+                <summary>Typografie & Form</summary>
 
                 <div class="control-group">
-                  <span class="control-label">Typography</span>
+                  <span class="control-label">Typografie</span>
                   <div class="token-input-group">
-                    <label for="font-heading">Heading</label>
+                    <label for="font-heading">Überschrift</label>
                     <select id="font-heading" data-var="--pv-font-heading">
                       <option value="'Outfit', sans-serif">Outfit</option>
                       <option value="'Inter', sans-serif">Inter</option>
@@ -106,36 +105,38 @@
                     </select>
                   </div>
                   <div class="token-input-group">
-                    <label for="font-body">Body</label>
+                    <label for="font-body">Fließtext</label>
                     <select id="font-body" data-var="--pv-font-body">
                       <option value="'Inter', sans-serif">Inter</option>
                       <option value="'Outfit', sans-serif">Outfit</option>
-                      <option value="system-ui, sans-serif">System Default</option>
+                      <option value="system-ui, sans-serif">System-Standard</option>
                     </select>
                   </div>
                 </div>
 
                 <div class="control-group">
-                  <span class="control-label">Border Radius</span>
+                  <span class="control-label">Eckenradius</span>
                   <label for="radius-slider" class="sr-only">Radius einstellen</label>
                   <input type="range" id="radius-slider" min="0" max="50" value="30" />
                   <div class="range-hints">
-                    <span>Sharp</span>
-                    <span>Soft</span>
+                    <span>Scharf</span>
+                    <span>Weich</span>
                     <span>Pill</span>
                   </div>
                 </div>
               </details>
 
               <button class="step-primary-btn" data-go-step="export">Weiter zu Export</button>
+              <button class="step-link-btn" data-go-step="style">Zurück zu Stil</button>
             </section>
 
             <section class="step-panel" data-step-panel="export">
               <p class="control-help">
-                Exportiere dein aktuelles Set als CSS Variablen, JSON Tokens und AI Prompts.
+                Exportiere dein aktuelles Set als CSS-Variablen, Design-Tokens und KI-Prompts.
               </p>
-              <button class="step-primary-btn" id="export-btn">Export Design System</button>
-              <button class="step-link-btn" data-go-step="tokens">Zurueck zu Tokens</button>
+              <button class="step-primary-btn" id="export-btn">Design-System exportieren</button>
+              <button class="step-link-btn" data-go-step="tokens">Zurück zu Tokens</button>
+              <button class="step-link-btn" data-go-step="style">Stil neu wählen</button>
             </section>
           </div>
         </aside>
@@ -143,112 +144,144 @@
         <main class="canvas-wrapper">
           <header class="canvas-header">
             <div>
-              <div class="canvas-title">Live Preview</div>
-              <p class="canvas-subtitle" id="step-context-text">Schritt 1: Waehle die passende Stilfamilie.</p>
+              <div class="canvas-title">Live-Vorschau</div>
+              <p class="canvas-subtitle" id="step-context-text">Schritt 1: Wähle die passende Stilfamilie.</p>
+            </div>
+            <div class="canvas-header-actions">
+              <button class="info-btn" id="style-info-btn" aria-expanded="false" aria-controls="style-info-card" title="Stil-Info">
+                i
+              </button>
             </div>
           </header>
+
+          <section class="style-info-card hidden" id="style-info-card" aria-live="polite">
+            <h3 id="info-style-name">Stilname</h3>
+            <p id="info-style-summary"></p>
+            <div class="info-grid">
+              <div>
+                <h4>Geeignet für</h4>
+                <p id="info-style-suitable"></p>
+              </div>
+              <div>
+                <h4>Nicht empfohlen für</h4>
+                <p id="info-style-avoid"></p>
+              </div>
+              <div>
+                <h4>Empfohlen</h4>
+                <p id="info-style-dos"></p>
+              </div>
+              <div>
+                <h4>Vermeiden</h4>
+                <p id="info-style-donts"></p>
+              </div>
+            </div>
+          </section>
 
           <div class="preview-canvas channel-web" id="preview-canvas">
             <div class="sg-container">
               <div class="sg-header">
-                <h1 id="preview-brand-title">Brand / UI Title</h1>
-                <p>UI Styleguide & Design System</p>
+                <h1 id="preview-brand-title">Marke / UI Titel</h1>
+                <p>Stilguide & Design-System</p>
               </div>
 
               <div class="sg-grid">
                 <div class="sg-card">
-                  <h2>Brand Colors</h2>
+                  <h2>Markenfarben</h2>
                   <div class="color-row">
                     <div class="color-swatch" id="swatch-1"></div>
                     <div class="color-info">
-                      <span class="color-name">Primary Accent</span>
+                      <span class="color-name">Primäre Akzentfarbe</span>
                       <span class="color-hex">Hex: <span class="hex-val" id="hex-1">#f5a8a0</span></span>
                     </div>
                   </div>
                   <div class="color-row">
                     <div class="color-swatch" id="swatch-2"></div>
                     <div class="color-info">
-                      <span class="color-name">Secondary Accent</span>
+                      <span class="color-name">Sekundäre Akzentfarbe</span>
                       <span class="color-hex">Hex: <span class="hex-val" id="hex-2">#a8d7d8</span></span>
                     </div>
                   </div>
                 </div>
 
                 <div class="sg-card">
-                  <h2>Text & Surfaces</h2>
+                  <h2>Text & Flächen</h2>
                   <div class="color-row">
                     <div class="color-swatch" id="swatch-text"></div>
                     <div class="color-info">
-                      <span class="color-name">Text Dark</span>
+                      <span class="color-name">Text dunkel</span>
                       <span class="color-hex">Hex: <span class="hex-val" id="hex-text">#3a3a3a</span></span>
                     </div>
                   </div>
                   <div class="color-row">
                     <div class="color-swatch swatch-surface" id="swatch-surface"></div>
                     <div class="color-info">
-                      <span class="color-name">Surface Background</span>
+                      <span class="color-name">Hintergrundfläche</span>
                       <span class="color-hex">Hex: <span class="hex-val" id="hex-surface">#FFFFFF</span></span>
                     </div>
                   </div>
                 </div>
 
                 <div class="sg-card">
-                  <h2>Typography</h2>
+                  <h2>Typografie</h2>
                   <div class="type-example">
                     <div class="type-label">
-                      Heading Font
+                      Überschrift
                       <span id="font-family-heading-display" class="font-family-display"></span>
                     </div>
                     <div class="type-showcase">
                       <h1>Aa</h1>
-                      <h3>The quick brown fox jumps...</h3>
+                      <h3>Franz jagt im komplett verwahrlosten Taxi quer durch Bayern.</h3>
                     </div>
                   </div>
                   <div class="type-example">
                     <div class="type-label">
-                      Body Font
+                      Fließtext
                       <span id="font-family-body-display" class="font-family-display"></span>
                     </div>
                     <div class="type-showcase">
                       <p class="type-aa">Aa</p>
-                      <p>The quick brown fox jumps over the lazy dog. Lorem ipsum dolor sit amet.</p>
+                      <p>Zwölf Boxkämpfer jagen Eva quer durch Sylt.</p>
                     </div>
                   </div>
                 </div>
 
                 <div class="sg-card">
-                  <h2>UI Components</h2>
+                  <h2>UI-Komponenten</h2>
                   <div class="type-label">Buttons</div>
                   <div class="btn-group">
-                    <button class="btn btn-primary">Primary Action</button>
-                    <button class="btn btn-secondary">Secondary</button>
+                    <button class="btn btn-primary">Primäre Aktion</button>
+                    <button class="btn btn-secondary">Sekundär</button>
                   </div>
 
-                  <div class="type-label input-label">Input Elements</div>
-                  <div class="input-example">Standard Input Field</div>
-                  <div class="input-example active">Focused / Active State</div>
+                  <div class="type-label input-label">Eingabefelder</div>
+                  <div class="input-example">Standard-Eingabefeld</div>
+                  <div class="input-example active">Fokus / Aktiv</div>
                 </div>
 
                 <div class="sg-card sg-wide">
-                  <h2>Shapes & Elevation</h2>
+                  <h2>Formen & Tiefe</h2>
+                  <p class="section-explainer">
+                    Diese Vorschau zeigt die Wirkung von Eckenradien und Schatten auf Lesbarkeit,
+                    Hierarchie und Klickgefühl in Buttons, Karten und Eingabefeldern.
+                  </p>
                   <div class="shape-row">
-                    <div class="shape-box radius-sm">Small</div>
-                    <div class="shape-box radius-md">Medium</div>
-                    <div class="shape-box radius-lg">Large</div>
+                    <div class="shape-box radius-sm">Klein</div>
+                    <div class="shape-box radius-md">Mittel</div>
+                    <div class="shape-box radius-lg">Groß</div>
                     <div class="shape-box radius-pill">Pill</div>
                   </div>
 
                   <div class="shadow-row">
                     <div class="shadow-box shadow-soft">
-                      Soft Shadow
+                      Leichter Schatten
                       <span id="shadow-val-soft" class="shadow-val"></span>
                     </div>
                     <div class="shadow-box shadow-card">
-                      Card Shadow
+                      Karten-Schatten
                       <span id="shadow-val-card" class="shadow-val"></span>
                     </div>
                     <div class="shadow-box shadow-hover">
-                      Hover Shadow
+                      Hover-Schatten
                       <span id="shadow-val-hover" class="shadow-val"></span>
                     </div>
                   </div>
@@ -261,7 +294,7 @@
 
       <footer class="global-footer">
         <span>StyleGuider hilft dir, konsistente Brand-Systeme schneller auszurollen.</span>
-        <nav aria-label="Footer links">
+        <nav aria-label="Footer-Links">
           <a href="#" role="button">Hilfe</a>
           <a href="#" role="button">Kontakt</a>
           <a href="#" role="button">Status</a>
@@ -271,31 +304,31 @@
       <div id="export-modal" class="modal-overlay hidden">
         <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
           <header class="modal-header">
-            <h2 id="export-modal-title">Export Design System</h2>
-            <button id="close-modal" class="close-btn" aria-label="Export Modal schliessen">&times;</button>
+            <h2 id="export-modal-title">Design-System exportieren</h2>
+            <button id="close-modal" class="close-btn" aria-label="Export-Modal schließen">&times;</button>
           </header>
           <div class="modal-tabs">
-            <button class="tab-btn active" data-tab="css">CSS Variables</button>
-            <button class="tab-btn" data-tab="json">Design Tokens</button>
-            <button class="tab-btn" data-tab="ai">AI Agent Prompt</button>
-            <button class="tab-btn" data-tab="image">Image Gen AI</button>
+            <button class="tab-btn active" data-tab="css">CSS-Variablen</button>
+            <button class="tab-btn" data-tab="json">Design-Tokens</button>
+            <button class="tab-btn" data-tab="ai">KI-Agent Prompt</button>
+            <button class="tab-btn" data-tab="image">Bild-KI Prompt</button>
           </div>
           <div class="modal-body">
             <div class="tab-content active" id="tab-css">
               <pre><code id="export-css-code"></code></pre>
-              <button class="copy-btn" data-target="export-css-code">Copy CSS</button>
+              <button class="copy-btn" data-target="export-css-code">Kopieren</button>
             </div>
             <div class="tab-content" id="tab-json">
               <pre><code id="export-json-code"></code></pre>
-              <button class="copy-btn" data-target="export-json-code">Copy JSON</button>
+              <button class="copy-btn" data-target="export-json-code">Kopieren</button>
             </div>
             <div class="tab-content" id="tab-ai">
               <pre><code id="export-ai-code"></code></pre>
-              <button class="copy-btn" data-target="export-ai-code">Copy Prompt</button>
+              <button class="copy-btn" data-target="export-ai-code">Kopieren</button>
             </div>
             <div class="tab-content" id="tab-image">
               <pre><code id="export-image-code"></code></pre>
-              <button class="copy-btn" data-target="export-image-code">Copy Prompt</button>
+              <button class="copy-btn" data-target="export-image-code">Kopieren</button>
             </div>
           </div>
         </div>

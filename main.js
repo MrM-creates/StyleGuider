@@ -6,9 +6,9 @@ let currentChannel = 'web';
 let currentStep = 'style';
 
 const STEP_HINTS = {
-  style: 'Schritt 1: Waehle die passende Stilfamilie.',
+  style: 'Schritt 1: Wähle die passende Stilfamilie.',
   tokens: 'Schritt 2: Verfeinere Farben, Typografie und Form.',
-  export: 'Schritt 3: Exportiere dein Design-System fuer die Umsetzung.'
+  export: 'Schritt 3: Exportiere dein Design-System für die Umsetzung.'
 };
 
 function safeFontString(family) {
@@ -31,6 +31,14 @@ const stepBtns = document.querySelectorAll('.step-btn');
 const stepPanels = document.querySelectorAll('.step-panel');
 const nextStepBtns = document.querySelectorAll('[data-go-step]');
 const stepContextText = document.getElementById('step-context-text');
+const styleInfoBtn = document.getElementById('style-info-btn');
+const styleInfoCard = document.getElementById('style-info-card');
+const infoStyleName = document.getElementById('info-style-name');
+const infoStyleSummary = document.getElementById('info-style-summary');
+const infoStyleSuitable = document.getElementById('info-style-suitable');
+const infoStyleAvoid = document.getElementById('info-style-avoid');
+const infoStyleDos = document.getElementById('info-style-dos');
+const infoStyleDonts = document.getElementById('info-style-donts');
 
 const displayHex = {
   '--pv-color-1': document.getElementById('hex-1'),
@@ -63,6 +71,21 @@ function updateRadii(baseValue) {
   root.style.setProperty('--pv-radius-md', `${val}px`);
   root.style.setProperty('--pv-radius-lg', `${val + 10}px`);
   root.style.setProperty('--pv-radius-pill', '500px');
+}
+
+function formatList(items) {
+  if (!items || !items.length) return 'Keine Angabe';
+  return items.map((item) => item.replaceAll('_', ' ')).join(', ');
+}
+
+function setStyleInfo(styleObj) {
+  if (!styleObj) return;
+  infoStyleName.innerText = styleObj.style_family.name;
+  infoStyleSummary.innerText = styleObj.style_family.summary || 'Keine Beschreibung verfügbar.';
+  infoStyleSuitable.innerText = formatList(styleObj.style_family.suitable_for);
+  infoStyleAvoid.innerText = formatList(styleObj.style_family.not_recommended_for);
+  infoStyleDos.innerText = formatList(styleObj.dos);
+  infoStyleDonts.innerText = formatList(styleObj.donts);
 }
 
 function setStep(stepId) {
@@ -134,6 +157,7 @@ function applyTheme(themeId) {
   if (fontHeadingDisplay) fontHeadingDisplay.innerText = tokens.typography_roles.heading.family;
   if (fontBodyDisplay) fontBodyDisplay.innerText = tokens.typography_roles.body.family;
 
+  setStyleInfo(styleObj);
   updateShadowLabels();
 }
 
@@ -231,10 +255,28 @@ function initUI() {
 
 initUI();
 
-const exportBtns = [
-  document.getElementById('export-btn'),
-  document.getElementById('export-btn-header')
-].filter(Boolean);
+if (styleInfoBtn && styleInfoCard) {
+  styleInfoBtn.addEventListener('click', () => {
+    const isOpen = !styleInfoCard.classList.contains('hidden');
+    styleInfoCard.classList.toggle('hidden', isOpen);
+    styleInfoBtn.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (
+      !styleInfoCard.classList.contains('hidden') &&
+      target instanceof Node &&
+      !styleInfoCard.contains(target) &&
+      !styleInfoBtn.contains(target)
+    ) {
+      styleInfoCard.classList.add('hidden');
+      styleInfoBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+const exportBtns = [document.getElementById('export-btn')].filter(Boolean);
 
 const exportModal = document.getElementById('export-modal');
 const closeModalBtn = document.getElementById('close-modal');
@@ -331,7 +373,7 @@ Aesthetic: clean lines, modern web design, highly detailed, 8k resolution, dribb
     document.getElementById('export-image-code').innerText = imagePrompt;
   } catch (err) {
     console.error('Export Generator failed:', err);
-    alert('Export failed due to missing properties. Check console.');
+    alert('Export fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.');
   }
 }
 
@@ -372,7 +414,7 @@ copyBtns.forEach((btn) => {
     const text = document.getElementById(targetId).innerText;
     navigator.clipboard.writeText(text).then(() => {
       const originalText = e.currentTarget.innerText;
-      e.currentTarget.innerText = 'Copied!';
+      e.currentTarget.innerText = 'Kopiert';
       setTimeout(() => {
         e.currentTarget.innerText = originalText;
       }, 1500);

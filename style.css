@@ -100,24 +100,14 @@ body {
   gap: 12px;
 }
 
-.status-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  border: 1px solid #bee7d9;
-  background: #f2fbf7;
-  color: #0f6348;
+.header-note {
   font-size: 0.82rem;
+  color: var(--ui-text-muted);
+  font-weight: 600;
 }
 
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ui-success);
-  box-shadow: 0 0 0 4px rgba(13, 159, 110, 0.2);
+.hidden {
+  display: none;
 }
 
 .app-shell {
@@ -346,6 +336,10 @@ input[type='range'] {
   cursor: pointer;
 }
 
+.step-link-btn:hover {
+  color: var(--ui-accent);
+}
+
 .step-primary-btn:hover,
 .export-btn:hover {
   background: var(--ui-accent-hover);
@@ -362,7 +356,34 @@ input[type='range'] {
 }
 
 .canvas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
   padding: 8px 6px 4px;
+}
+
+.canvas-header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.info-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--ui-border);
+  background: var(--ui-surface-muted);
+  color: var(--ui-text);
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.info-btn:hover {
+  border-color: var(--ui-accent);
+  color: var(--ui-accent);
 }
 
 .canvas-title {
@@ -377,6 +398,46 @@ input[type='range'] {
   margin: 5px 0 0;
   color: var(--ui-text);
   font-size: 0.92rem;
+}
+
+.style-info-card {
+  margin: 2px 6px 8px;
+  border: 1px solid var(--ui-border);
+  border-radius: 12px;
+  background: var(--ui-surface-muted);
+  padding: 14px;
+}
+
+.style-info-card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.style-info-card > p {
+  margin: 0 0 12px;
+  color: var(--ui-text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+
+.info-grid h4 {
+  margin: 0 0 6px;
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ui-text-muted);
+}
+
+.info-grid p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
 }
 
 .preview-canvas {
@@ -467,6 +528,12 @@ input[type='range'] {
   color: var(--pv-text-light);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.section-explainer {
+  margin: -4px 0 18px;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .color-row {
@@ -919,5 +986,9 @@ a:focus-visible {
 
   .modal-tabs {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
