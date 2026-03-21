@@ -1116,59 +1116,137 @@ function addCanvasPageToPdf(pdf, canvas, addNewPage = false) {
   pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, renderWidth, renderHeight, undefined, 'FAST');
 }
 
+function hexToRgb(hexColor, fallback = [255, 255, 255]) {
+  const value = (hexColor || '').replace('#', '').trim();
+  if (![3, 6].includes(value.length)) return fallback;
+  const normalized = value.length === 3 ? value.split('').map((c) => c + c).join('') : value;
+  const intVal = Number.parseInt(normalized, 16);
+  if (Number.isNaN(intVal)) return fallback;
+  return [(intVal >> 16) & 255, (intVal >> 8) & 255, intVal & 255];
+}
+
 function addSimplePdfFallback(pdf, styleObj, targetChannel) {
   const info = handbookInfoFor(styleObj);
   const channelData = getChannelSpecData(styleObj, targetChannel);
   const live = getLiveExportTokens();
+  const [bgR, bgG, bgB] = hexToRgb(live.background, [249, 250, 252]);
+  const [surfaceR, surfaceG, surfaceB] = hexToRgb(live.surface, [255, 255, 255]);
+  const [textR, textG, textB] = hexToRgb(live.text_primary, [24, 39, 58]);
+  const [mutedR, mutedG, mutedB] = hexToRgb(live.text_secondary, [78, 92, 110]);
+  const [primaryR, primaryG, primaryB] = hexToRgb(live.primary, [15, 118, 110]);
+  const [accentR, accentG, accentB] = hexToRgb(live.accent, [232, 146, 43]);
 
-  const writeBlock = (title, text, startY) => {
-    const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 10;
+  const gap = 4;
+  const cardWidth = (pageWidth - margin * 2 - gap) / 2;
+
+  const drawHeader = (title, subtitle) => {
+    pdf.setFillColor(bgR, bgG, bgB);
+    pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+
     pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(11);
-    pdf.text(title, 12, startY);
+    pdf.setFontSize(22);
+    pdf.setTextColor(textR, textG, textB);
+    pdf.text(title, margin, 18);
+
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(10);
-    const lines = pdf.splitTextToSize(text || 'Keine Angabe', pageWidth - 24);
-    pdf.text(lines, 12, startY + 5);
-    return startY + 8 + lines.length * 4.2;
+    pdf.setTextColor(mutedR, mutedG, mutedB);
+    pdf.text(subtitle, margin, 24);
   };
 
-  let y = 14;
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(17);
-  pdf.text(styleObj.style_family.name, 12, y);
-  y += 7;
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.text(`Seite 1 von 2 · ${channelData.label}`, 12, y);
-  y += 8;
+  const drawCard = (x, y, width, title, body, minHeight = 26) => {
+    const maxTextWidth = width - 6;
+    const bodyLines = pdf.splitTextToSize(body || 'Keine Angabe', maxTextWidth);
+    const cardHeight = Math.max(minHeight, 10 + bodyLines.length * 3.8 + 7);
 
-  y = writeBlock('Kurzbeschreibung', styleObj.style_family.summary || info.effect, y);
-  y = writeBlock('Wirkung', info.effect, y);
-  y = writeBlock('Geeignet für', info.suitable, y);
-  y = writeBlock('Weniger geeignet für', info.avoid, y);
-  y = writeBlock('Empfohlen', info.dos, y);
-  y = writeBlock('Vermeiden', info.donts, y);
-  y = writeBlock('Hinweise Web', info.web, y);
-  y = writeBlock('Hinweise Print', info.print, y);
-  writeBlock('Typische Gefahr', info.risk, y);
+    pdf.setDrawColor(207, 216, 227);
+    pdf.setFillColor(surfaceR, surfaceG, surfaceB);
+    pdf.roundedRect(x, y, width, cardHeight, 2.4, 2.4, 'FD');
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.setTextColor(textR, textG, textB);
+    pdf.text(title, x + 3, y + 6);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(mutedR, mutedG, mutedB);
+    pdf.text(bodyLines, x + 3, y + 10);
+
+    return cardHeight;
+  };
+
+  drawHeader(styleObj.style_family.name, `Seite 1 von 2 · Stilbeschreibung · ${channelData.label}`);
+  let y = 30;
+
+  y += drawCard(margin, y, pageWidth - margin * 2, 'Kurzbeschreibung', styleObj.style_family.summary || info.effect, 24) + gap;
+  y += drawCard(margin, y, pageWidth - margin * 2, 'Wirkung', info.effect, 24) + gap;
+
+  const leftStart = y;
+  const left1 = drawCard(margin, leftStart, cardWidth, 'Geeignet für', info.suitable, 30);
+  const right1 = drawCard(margin + cardWidth + gap, leftStart, cardWidth, 'Weniger geeignet für', info.avoid, 30);
+  y = leftStart + Math.max(left1, right1) + gap;
+
+  const left2 = drawCard(margin, y, cardWidth, 'Empfohlen', info.dos, 30);
+  const right2 = drawCard(margin + cardWidth + gap, y, cardWidth, 'Vermeiden', info.donts, 30);
+  y += Math.max(left2, right2) + gap;
+
+  const left3 = drawCard(margin, y, cardWidth, 'Hinweise Web', info.web, 26);
+  const right3 = drawCard(margin + cardWidth + gap, y, cardWidth, 'Hinweise Print', info.print, 26);
+  y += Math.max(left3, right3) + gap;
+
+  drawCard(margin, y, pageWidth - margin * 2, 'Typische Gefahr', info.risk, 24);
 
   pdf.addPage();
-  y = 14;
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(17);
-  pdf.text(`${styleObj.style_family.name} · Live-Attribute`, 12, y);
-  y += 7;
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(10);
-  pdf.text('Seite 2 von 2 · Stabilmodus', 12, y);
-  y += 8;
+  drawHeader(`${styleObj.style_family.name} · Live-Attribute`, 'Seite 2 von 2 · Stabilmodus');
+  y = 30;
 
-  y = writeBlock(channelData.rulesTitle, formatSpecValue(channelData.rules), y);
-  y = writeBlock(channelData.templateTitle, formatSpecValue(channelData.template), y);
-  y = writeBlock('Farben', `Hintergrund ${live.background}, Fläche ${live.surface}, Primär ${live.primary}, Akzent ${live.accent}`, y);
-  y = writeBlock('Typografie', `Überschrift ${live.heading_font}, Fließtext ${live.body_font}`, y);
-  writeBlock('Formen', `Radius sm ${live.radius_sm}, md ${live.radius_md}, lg ${live.radius_lg}, pill ${live.radius_pill}`, y);
+  y += drawCard(margin, y, pageWidth - margin * 2, channelData.rulesTitle, formatSpecValue(channelData.rules), 30) + gap;
+  y += drawCard(margin, y, pageWidth - margin * 2, channelData.templateTitle, formatSpecValue(channelData.template), 26) + gap;
+
+  const swatchY = y;
+  const swatchCardHeight = 36;
+  pdf.setDrawColor(207, 216, 227);
+  pdf.setFillColor(surfaceR, surfaceG, surfaceB);
+  pdf.roundedRect(margin, swatchY, pageWidth - margin * 2, swatchCardHeight, 2.4, 2.4, 'FD');
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(9);
+  pdf.setTextColor(textR, textG, textB);
+  pdf.text('Farben', margin + 3, swatchY + 6);
+
+  const swatches = [
+    ['BG', live.background, bgR, bgG, bgB],
+    ['Fläche', live.surface, surfaceR, surfaceG, surfaceB],
+    ['Primär', live.primary, primaryR, primaryG, primaryB],
+    ['Akzent', live.accent, accentR, accentG, accentB]
+  ];
+
+  let swX = margin + 3;
+  swatches.forEach(([label, value, r, g, b]) => {
+    pdf.setFillColor(r, g, b);
+    pdf.roundedRect(swX, swatchY + 10, 10, 10, 1.4, 1.4, 'F');
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(textR, textG, textB);
+    pdf.text(String(label), swX + 12, swatchY + 14);
+    pdf.setTextColor(mutedR, mutedG, mutedB);
+    pdf.text(String(value), swX + 12, swatchY + 18);
+    swX += 45;
+  });
+
+  y += swatchCardHeight + gap;
+  y += drawCard(margin, y, pageWidth - margin * 2, 'Typografie', `Überschrift: ${live.heading_font}\nFließtext: ${live.body_font}`, 24) + gap;
+  drawCard(
+    margin,
+    y,
+    pageWidth - margin * 2,
+    'Formen',
+    `Radius sm: ${live.radius_sm}, md: ${live.radius_md}, lg: ${live.radius_lg}, pill: ${live.radius_pill}`,
+    24
+  );
 }
 
 async function savePdfBlob(blob, fileName) {
