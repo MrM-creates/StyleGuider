@@ -9,11 +9,8 @@
     <div id="app">
       <header class="global-header">
         <div class="brand-block">
-          <span class="eyebrow">StyleGuider für Designer & Entwickler</span>
-          <h1>Erstelle dein Brand-System in 3 klaren Schritten</h1>
-        </div>
-        <div class="header-actions">
-          <span class="header-note">Design-System Generator</span>
+          <h1>StyleGuider</h1>
+          <p class="header-copy">Kuratierte Stile für ein konsistentes Design</p>
         </div>
       </header>
 
@@ -21,7 +18,7 @@
         <aside class="sidebar">
           <div class="sidebar-intro">
             <p>
-              Du wählst eine Stilfamilie, passt Tokens an und exportierst alles für Web & Print.
+              Du wählst einen Stil, passt Attribute an und exportierst alles für Web und Print.
             </p>
           </div>
 
@@ -30,9 +27,18 @@
               <span class="step-index">1</span>
               Stil wählen
             </button>
+
+            <div class="style-picker-inline">
+              <label for="style-presets-select" class="sr-only">Vorhandenen Stil auswählen</label>
+              <select id="style-presets-select" class="fs-input" aria-describedby="style-help"></select>
+              <p id="style-help" class="control-help">
+                Wähle einen kuratierten Stil als Grundlage.
+              </p>
+            </div>
+
             <button class="step-btn" data-step="tokens">
               <span class="step-index">2</span>
-              Tokens anpassen
+              Attribute anpassen
             </button>
             <button class="step-btn" data-step="export">
               <span class="step-index">3</span>
@@ -43,15 +49,6 @@
           <div class="sidebar-content">
             <section class="step-panel active" data-step-panel="style">
               <div class="control-group">
-                <span class="control-label">Stilfamilie</span>
-                <label for="style-presets-select" class="sr-only">Stil auswählen</label>
-                <select id="style-presets-select" class="fs-input" aria-describedby="style-help"></select>
-                <p id="style-help" class="control-help">
-                  Das Preset setzt Farben, Typografie und Grundform für deine Marke.
-                </p>
-              </div>
-
-              <div class="control-group">
                 <span class="control-label">Kanal</span>
                 <div id="channel-presets-container" class="channel-toggle" role="group" aria-label="Kanal wählen">
                   <button class="theme-btn active" data-channel="web">Web</button>
@@ -59,12 +56,12 @@
                 </div>
               </div>
 
-              <button class="step-primary-btn" data-go-step="tokens">Weiter zu Tokens</button>
+              <button class="step-primary-btn" data-go-step="tokens">Weiter zu Attributen</button>
             </section>
 
             <section class="step-panel" data-step-panel="tokens">
               <div class="control-group">
-                <span class="control-label">Kernfarben</span>
+                <span class="control-label">Farben</span>
                 <div class="token-input-group">
                   <label for="bg-color">Hintergrund</label>
                   <input type="color" id="bg-color" value="#FFFCF9" data-var="--pv-bg-main" />
@@ -86,7 +83,7 @@
                   <input type="color" id="text-dark-color" value="#3a3a3a" data-var="--pv-text-dark" />
                 </div>
                 <p class="control-help">
-                  Token-Anpassung ist Feintuning: So bleibt die Stilidentität erhalten.
+                  Bitte die Anpassungen vorsichtig durchführen. Farben, Typografie und Formen sind sorgfältig aufeinander abgestimmt.
                 </p>
               </div>
 
@@ -126,6 +123,13 @@
                 </div>
               </details>
 
+              <div class="custom-style-box">
+                <label for="new-style-name" class="control-label">Neuen Stil erstellen</label>
+                <input id="new-style-name" class="fs-input" type="text" placeholder="Name für neuen Stil" maxlength="60" />
+                <button class="step-primary-btn" id="save-style-btn">Als neuen Stil speichern</button>
+                <p id="save-style-feedback" class="save-style-feedback" aria-live="polite"></p>
+              </div>
+
               <button class="step-primary-btn" data-go-step="export">Weiter zu Export</button>
               <button class="step-link-btn" data-go-step="style">Zurück zu Stil</button>
             </section>
@@ -135,7 +139,7 @@
                 Exportiere dein aktuelles Set als CSS-Variablen, Design-Tokens und KI-Prompts.
               </p>
               <button class="step-primary-btn" id="export-btn">Design-System exportieren</button>
-              <button class="step-link-btn" data-go-step="tokens">Zurück zu Tokens</button>
+              <button class="step-link-btn" data-go-step="tokens">Zurück zu Attributen</button>
               <button class="step-link-btn" data-go-step="style">Stil neu wählen</button>
             </section>
           </div>
@@ -143,10 +147,7 @@
 
         <main class="canvas-wrapper">
           <header class="canvas-header">
-            <div>
-              <div class="canvas-title">Live-Vorschau</div>
-              <p class="canvas-subtitle" id="step-context-text">Schritt 1: Wähle die passende Stilfamilie.</p>
-            </div>
+            <p class="canvas-subtitle" id="step-context-text">Schritt 1: Wähle die passende Stilfamilie.</p>
             <div class="canvas-header-actions">
               <button class="info-btn" id="style-info-btn" aria-expanded="false" aria-controls="style-info-card" title="Stil-Info">
                 i
@@ -156,14 +157,14 @@
 
           <section class="style-info-card hidden" id="style-info-card" aria-live="polite">
             <h3 id="info-style-name">Stilname</h3>
-            <p id="info-style-summary"></p>
+            <p id="info-style-effect"></p>
             <div class="info-grid">
               <div>
                 <h4>Geeignet für</h4>
                 <p id="info-style-suitable"></p>
               </div>
               <div>
-                <h4>Nicht empfohlen für</h4>
+                <h4>Weniger geeignet für</h4>
                 <p id="info-style-avoid"></p>
               </div>
               <div>
@@ -174,6 +175,18 @@
                 <h4>Vermeiden</h4>
                 <p id="info-style-donts"></p>
               </div>
+              <div>
+                <h4>Hinweise Web</h4>
+                <p id="info-style-web"></p>
+              </div>
+              <div>
+                <h4>Hinweise Print</h4>
+                <p id="info-style-print"></p>
+              </div>
+              <div>
+                <h4>Typische Gefahr</h4>
+                <p id="info-style-risk"></p>
+              </div>
             </div>
           </section>
 
@@ -181,7 +194,6 @@
             <div class="sg-container">
               <div class="sg-header">
                 <h1 id="preview-brand-title">Marke / UI Titel</h1>
-                <p>Stilguide & Design-System</p>
               </div>
 
               <div class="sg-grid">
@@ -265,10 +277,10 @@
                     Hierarchie und Klickgefühl in Buttons, Karten und Eingabefeldern.
                   </p>
                   <div class="shape-row">
-                    <div class="shape-box radius-sm">Klein</div>
-                    <div class="shape-box radius-md">Mittel</div>
-                    <div class="shape-box radius-lg">Groß</div>
-                    <div class="shape-box radius-pill">Pill</div>
+                    <div class="shape-box radius-sm">Eingaben</div>
+                    <div class="shape-box radius-md">Buttons</div>
+                    <div class="shape-box radius-lg">Karten</div>
+                    <div class="shape-box radius-pill">Hinweis-Chips</div>
                   </div>
 
                   <div class="shadow-row">
@@ -293,12 +305,7 @@
       </div>
 
       <footer class="global-footer">
-        <span>StyleGuider hilft dir, konsistente Brand-Systeme schneller auszurollen.</span>
-        <nav aria-label="Footer-Links">
-          <a href="#" role="button">Hilfe</a>
-          <a href="#" role="button">Kontakt</a>
-          <a href="#" role="button">Status</a>
-        </nav>
+        <span>Coding by a gentle Coding Agent · © MrM · <span id="footer-year"></span></span>
       </footer>
 
       <div id="export-modal" class="modal-overlay hidden">
