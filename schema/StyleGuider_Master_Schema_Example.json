@@ -1,0 +1,345 @@
+{
+  "schema_version": "1.0.0",
+  "release_id": "sg-warm-human-2026-03-20-a",
+  "created_at": "2026-03-20T10:55:00Z",
+  "locale": "de-CH",
+  "style_family": {
+    "id": "warm_human",
+    "label": "Warm Human",
+    "category": "core",
+    "summary": "Zugänglich, freundlich und vertrauensvoll mit weicher, aber kontrollierter Gestaltung.",
+    "recommended_for": ["Coaching", "Gesundheit", "Bildung", "lokale Dienstleistungen"],
+    "not_ideal_for": ["hochgradig technische Enterprise-Dashboards"],
+    "intent": {
+      "brand_effect": "Vertrauen, Nähe und emotionale Zugänglichkeit",
+      "positioning": "persönlich, menschlich, klar",
+      "tone_keywords": ["freundlich", "warm", "nahbar"]
+    },
+    "axes_profile": {
+      "emotionality": 78,
+      "expressiveness": 42,
+      "boldness": 35,
+      "precision": 38,
+      "luxury": 24,
+      "digital_first": 46
+    },
+    "visual_rules": {
+      "color_principle": "Sanfte, warme Töne mit klarer Hierarchie und kontrollierter Sättigung.",
+      "typography_principle": "Freundliche Sans mit guter Lesbarkeit und zurückhaltender Persönlichkeit.",
+      "layout_principle": "Offen, weich gegliedert, mit angenehmem Weißraum und klarer Führung.",
+      "shape_principle": "Mittlere bis größere Radien, aber ohne übertriebene Verspieltheit.",
+      "component_principle": "Ruhige UI mit klaren Zuständen und sichtbaren Fokusmarken.",
+      "imagery_principle": "Natürliches Licht, Nähe, Wärme und echte menschliche Situationen."
+    },
+    "dos": ["warme Neutrals nutzen", "freundliche Typohierarchie aufbauen"],
+    "donts": ["zu schwache Kontraste", "zu viele Primärfarben auf derselben Ebene"],
+    "channel_fit": {
+      "web": { "score": 90, "note": "Sehr geeignet für vertrauensbasierte Websites." },
+      "print": { "score": 84, "note": "Gut für Flyer, Karten und Angebotsunterlagen." },
+      "social": { "score": 76, "note": "Funktioniert gut, braucht aber klare Kontraste im Thumbnail." },
+      "presentation": { "score": 72, "note": "Gut, solange die Typogröße nicht zu weich skaliert." },
+      "image_ai": { "score": 81, "note": "Gut für menschliche, natürliche Bildwelten." }
+    },
+    "default_templates": ["web_homepage_hero", "flyer_a5_portrait", "social_post_square"]
+  },
+  "brand_profile": {
+    "brand_name": "Example Brand",
+    "industry": "Coaching",
+    "audience": ["Privatkund:innen", "KMU"],
+    "values": ["Vertrauen", "Menschlichkeit", "Klarheit"],
+    "personality": ["freundlich", "nahbar", "kompetent"],
+    "communication_goals": ["trust", "information", "conversion"],
+    "channel_priority": ["web", "print", "social"],
+    "constraints": ["drucktauglich", "leicht pflegbar"]
+  },
+  "design_axes": {
+    "emotionality": 78,
+    "expressiveness": 42,
+    "boldness": 35,
+    "precision": 38,
+    "luxury": 24,
+    "digital_first": 46
+  },
+  "tokens": {
+    "color": {
+      "base": {
+        "rose_100": "#F6E7E6",
+        "sand_100": "#F5F1EB",
+        "sage_400": "#8DA48E",
+        "ink_900": "#2B2A28"
+      },
+      "semantic": {
+        "background": "sand_100",
+        "surface": "#FFFFFF",
+        "surface_alt": "rose_100",
+        "text_primary": "ink_900",
+        "text_muted": "#6F6A66",
+        "accent": "sage_400",
+        "border": "#D8D0C8",
+        "success": "#4C8C68",
+        "warning": "#B8842F",
+        "error": "#B14C4C"
+      },
+      "interactive": {
+        "button_primary_bg": "sage_400",
+        "button_primary_text": "#FFFFFF",
+        "button_secondary_bg": "#FFFFFF",
+        "button_secondary_text": "ink_900",
+        "input_bg": "#FFFFFF",
+        "input_border": "#D8D0C8",
+        "input_focus_ring": "#8DA48E",
+        "link": "#6C8570",
+        "link_hover": "#56705B"
+      }
+    },
+    "typography": {
+      "font_family": {
+        "display": "Outfit",
+        "heading": "Outfit",
+        "body": "Inter",
+        "ui": "Inter"
+      },
+      "font_size": {
+        "display_xl": "56px",
+        "heading_l": "32px",
+        "body_m": "16px",
+        "label_s": "14px"
+      },
+      "font_weight": {
+        "regular": "400",
+        "medium": "500",
+        "semibold": "600",
+        "bold": "700"
+      },
+      "line_height": {
+        "tight": "1.1",
+        "normal": "1.5",
+        "relaxed": "1.7"
+      },
+      "letter_spacing": {
+        "tight": "-0.02em",
+        "normal": "0",
+        "wide": "0.02em"
+      },
+      "roles": {
+        "hero_title": "display_xl",
+        "section_title": "heading_l",
+        "card_title": "heading_l",
+        "body_text": "body_m",
+        "label": "label_s",
+        "caption": "label_s"
+      }
+    },
+    "space": {
+      "scale": {
+        "4": "4px",
+        "8": "8px",
+        "16": "16px",
+        "24": "24px",
+        "32": "32px",
+        "48": "48px",
+        "64": "64px"
+      },
+      "container": {
+        "page_max": "1200px",
+        "text_max": "72ch"
+      },
+      "section_padding": {
+        "sm": "32px",
+        "md": "48px",
+        "lg": "72px"
+      },
+      "component_gap": {
+        "sm": "8px",
+        "md": "16px",
+        "lg": "24px"
+      }
+    },
+    "radius": {
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px"
+    },
+    "border": {
+      "width": {
+        "default": "1px",
+        "strong": "2px"
+      },
+      "style": {
+        "default": "solid"
+      }
+    },
+    "shadow": {
+      "card": "0 10px 30px rgba(0,0,0,0.08)",
+      "menu": "0 12px 36px rgba(0,0,0,0.10)"
+    },
+    "motion": {
+      "duration": {
+        "fast": "120ms",
+        "normal": "200ms"
+      },
+      "easing": {
+        "standard": "ease",
+        "emphasized": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+      }
+    },
+    "states": {
+      "hover": {
+        "button_primary_bg": "#7C927E"
+      },
+      "active": {
+        "button_primary_bg": "#6C8570"
+      },
+      "disabled": {
+        "opacity": "0.5"
+      },
+      "focus": {
+        "ring_width": "2px",
+        "ring_color": "#8DA48E"
+      },
+      "success": {
+        "banner_bg": "#E7F4EC"
+      },
+      "error": {
+        "banner_bg": "#F8E5E5"
+      }
+    }
+  },
+  "channel_rules": {
+    "web": {
+      "goal": "Vertrauen, Klarheit und niedrige Hürde in Interaktionen.",
+      "required_rules": ["sichtbarer Fokus", "AA-Kontraste", "responsives Spacing"],
+      "overrides": {
+        "typography.font_size.display_xl": "48px"
+      },
+      "export_targets": ["design_tokens_json", "theme_json", "css_variables", "web_template_spec", "ui_code_agent_prompt"]
+    },
+    "print": {
+      "goal": "Ruhige, hochwertige Druckwirkung mit klarer Hierarchie.",
+      "required_rules": ["Beschnitt definieren", "PDF/X-4 Guidance", "großzügige Margins"],
+      "overrides": {
+        "space.section_padding.lg": "18mm"
+      },
+      "export_targets": ["print_spec", "print_template_spec", "brand_guide_pdf"]
+    },
+    "social": {
+      "goal": "Erkennbarkeit auf kleiner Fläche.",
+      "required_rules": ["starker Titelkontrast", "safe areas beachten"],
+      "overrides": {
+        "hierarchy.headline_priority": "high"
+      },
+      "export_targets": ["social_template_spec", "image_style_pack"]
+    },
+    "presentation": {
+      "goal": "Schnelle Lesbarkeit auf Distanz.",
+      "required_rules": ["große Typogrößen", "wenig Text pro Folie"],
+      "overrides": {},
+      "export_targets": ["presentation_template_spec", "brand_guide_pdf"]
+    },
+    "image_ai": {
+      "goal": "Natürliche, warme Bildwelt mit echter Nähe.",
+      "required_rules": ["natürliches Licht", "sanfte Farbdramaturgie"],
+      "overrides": {
+        "imagery.render_tendency": "photographic"
+      },
+      "export_targets": ["image_style_pack", "brand_copy_agent_prompt"]
+    }
+  },
+  "template_specs": [
+    {
+      "template_id": "web_homepage_hero",
+      "label": "Homepage Hero",
+      "channel": "web",
+      "goal": "trust",
+      "format": {
+        "ratio_or_size": "responsive",
+        "orientation": "responsive",
+        "safe_area": "content within central 80%",
+        "resolution": "screen"
+      },
+      "layout_zones": ["header", "hero_copy", "hero_image", "cta_row"],
+      "content_slots": [
+        { "slot_id": "headline", "required": true, "content_type": "headline", "max_length": 70 },
+        { "slot_id": "body", "required": true, "content_type": "body", "max_length": 220 },
+        { "slot_id": "cta_primary", "required": true, "content_type": "cta", "max_length": 24 }
+      ],
+      "component_rules": {
+        "allowed_components": ["button_primary", "button_secondary", "image_card"],
+        "forbidden_components": ["ticker_banner", "dense_data_table"]
+      },
+      "hierarchy_rules": {
+        "headline_priority": "high",
+        "image_text_balance": "balanced",
+        "cta_priority": "medium"
+      },
+      "export_rules": {
+        "file_types": ["json", "css", "md"],
+        "pdf_profile": "none"
+      }
+    },
+    {
+      "template_id": "flyer_a5_portrait",
+      "label": "Flyer A5 Portrait",
+      "channel": "print",
+      "goal": "information",
+      "format": {
+        "ratio_or_size": "A5",
+        "orientation": "portrait",
+        "safe_area": "5mm",
+        "bleed": "3mm",
+        "resolution": "300dpi"
+      },
+      "layout_zones": ["headline_band", "image", "body", "contact_footer"],
+      "content_slots": [
+        { "slot_id": "headline", "required": true, "content_type": "headline", "max_length": 55 },
+        { "slot_id": "body", "required": true, "content_type": "body", "max_length": 500 },
+        { "slot_id": "contact", "required": true, "content_type": "contact", "max_length": 180 }
+      ],
+      "component_rules": {
+        "allowed_components": ["section_title", "text_block", "image_frame"],
+        "forbidden_components": ["floating_cta", "complex_tabs"]
+      },
+      "hierarchy_rules": {
+        "headline_priority": "high",
+        "image_text_balance": "balanced",
+        "cta_priority": "none"
+      },
+      "export_rules": {
+        "file_types": ["json", "pdf", "md"],
+        "pdf_profile": "pdf_x4"
+      }
+    }
+  ],
+  "export_bundle": {
+    "system_export": ["design_tokens_json", "theme_json", "css_variables"],
+    "human_export": ["brand_guide_pdf", "quick_style_sheet", "do_dont_sheet"],
+    "channel_export": ["web_template_spec", "print_template_spec", "social_template_spec"],
+    "ai_export": ["ui_code_agent_prompt", "brand_copy_agent_prompt", "image_style_pack"],
+    "manifest": {
+      "release_id": "sg-warm-human-2026-03-20-a",
+      "style_family_id": "warm_human",
+      "artifact_paths": [
+        "schema/StyleGuider_Master_Schema.json",
+        "exports/warm-human/theme.json",
+        "exports/warm-human/brand-guide.pdf"
+      ]
+    }
+  },
+  "validation": {
+    "wcag_target": "wcag_2_2_aa",
+    "required_states_present": true,
+    "template_coverage": ["web", "print", "social", "presentation", "image_ai"],
+    "export_completeness": "expanded",
+    "warnings": []
+  },
+  "governance": {
+    "owner": "StyleGuider Core",
+    "approval_status": "draft",
+    "breaking_change": false
+  },
+  "notes": [
+    "Warm Human example object for initial implementation.",
+    "Further example objects should be created for each core style family."
+  ]
+}

@@ -1,0 +1,12 @@
+Repository: /mnt/data
+
+[master_example]
+  OK   schema/StyleGuider_Master_Schema_Example.json
+
+[style_family_examples]
+  No files found.
+
+[recommendation_seeds]
+  No files found.
+
+Validation finished successfully.

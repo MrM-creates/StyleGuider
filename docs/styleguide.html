@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anna's Baby Moments | Styleguide</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: #f0f4f8; /* Darker background to make cards pop */
+            padding: 40px 20px;
+        }
+        .sg-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .sg-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .sg-header h1 {
+            color: var(--text-dark);
+            font-size: 3rem;
+        }
+        .sg-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .sg-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            box-shadow: var(--shadow-soft);
+        }
+        .sg-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        /* Colors */
+        .color-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .color-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .color-name { font-weight: 600; font-family: var(--font-heading); font-size: 1.1rem; }
+        .color-hex { color: var(--text-light); font-family: monospace; }
+
+        /* Typography */
+        .type-example { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .type-example:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .type-label { font-size: 0.9rem; color: var(--text-light); margin-bottom: 10px; text-transform: uppercase; }
+        .type-showcase h1 { margin: 0; font-size: 3rem; }
+        .type-showcase p { margin: 0; font-size: 1.1rem; }
+
+        /* Buttons */
+        .btn-group { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;}
+    </style>
+</head>
+<body>
+
+<div class="sg-container">
+    <div class="sg-header">
+        <h1>Anna's Baby Moments - UI Styleguide</h1>
+        <p>Ein Überblick über das Design-System (Farben, Typografie, UI-Elemente)</p>
+    </div>
+
+    <div class="sg-grid">
+        <!-- Brand Colors Card -->
+        <div class="sg-card">
+            <h2>Brand Colors (Pastel)</h2>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--pink-dark);"></div>
+                <div class="color-info">
+                    <span class="color-name">Primary Pink</span>
+                    <span class="color-hex">Hex: #f5a8a0 | Var: --pink-dark</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--blue-dark);"></div>
+                <div class="color-info">
+                    <span class="color-name">Primary Blue</span>
+                    <span class="color-hex">Hex: #a8d7d8 | Var: --blue-dark</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--yellow-dark);"></div>
+                <div class="color-info">
+                    <span class="color-name">Primary Yellow</span>
+                    <span class="color-hex">Hex: #f5d774 | Var: --yellow-dark</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--green-dark);"></div>
+                <div class="color-info">
+                    <span class="color-name">Primary Green</span>
+                    <span class="color-hex">Hex: #a9d4a9 | Var: --green-dark</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Background & Base Colors Card -->
+        <div class="sg-card">
+            <h2>Background & Background Shades</h2>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--bg-main); border: 1px solid #ddd;"></div>
+                <div class="color-info">
+                    <span class="color-name">Background Main</span>
+                    <span class="color-hex">Hex: #FFFCF9 | Var: --bg-main</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--bg-white); border: 1px solid #ddd;"></div>
+                <div class="color-info">
+                    <span class="color-name">Surface White</span>
+                    <span class="color-hex">Hex: #FFFFFF | Var: --bg-white</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--pink);"></div>
+                <div class="color-info">
+                    <span class="color-name">Soft Pink (Accent Base)</span>
+                    <span class="color-hex">Hex: #fbd6d2 | Var: --pink</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--blue);"></div>
+                <div class="color-info">
+                    <span class="color-name">Soft Blue (Accent Base)</span>
+                    <span class="color-hex">Hex: #cce7e8 | Var: --blue</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text Colors Card -->
+        <div class="sg-card">
+            <h2>Text Colors</h2>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--text-dark);"></div>
+                <div class="color-info">
+                    <span class="color-name">Text Dark (Headings)</span>
+                    <span class="color-hex">Hex: #3a3a3a | Var: --text-dark</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--text-main);"></div>
+                <div class="color-info">
+                    <span class="color-name">Text Main (Body)</span>
+                    <span class="color-hex">Hex: #5a5a5a | Var: --text-main</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-swatch" style="background-color: var(--text-light);"></div>
+                <div class="color-info">
+                    <span class="color-name">Text Light (Muted)</span>
+                    <span class="color-hex">Hex: #888888 | Var: --text-light</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typography Card -->
+        <div class="sg-card">
+            <h2>Typography</h2>
+            <div class="type-example">
+                <div class="type-label">Headline Font: Outfit (Weights: 400, 500, 600, 700)</div>
+                <div class="type-showcase">
+                    <h1>Aa</h1>
+                    <h3 style="margin-top: 10px;">The quick brown fox jumps...</h3>
+                </div>
+            </div>
+            <div class="type-example">
+                <div class="type-label">Body Font: Inter (Weights: 300, 400, 500, 600)</div>
+                <div class="type-showcase">
+                    <p style="font-size: 3rem; line-height: 1;">Aa</p>
+                    <p style="margin-top: 10px;">The quick brown fox jumps over the lazy dog. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- UI Elements Card -->
+        <div class="sg-card">
+            <h2>UI Components</h2>
+            <div class="type-label">Buttons</div>
+            <div class="btn-group">
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn btn-secondary">Secondary Button</button>
+                <button class="btn btn-outline">Outline Button</button>
+            </div>
+            
+            <div class="type-label" style="margin-top: 30px;">Input Elements</div>
+            <div style="width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; font-family: 'Inter'; font-size: 1rem; color: #5a5a5a; background: #fff; margin-bottom: 10px;">
+                Input Field Example
+            </div>
+            <div style="width: 100%; padding: 15px; border: 2px solid #f5a8a0; border-radius: 12px; font-family: 'Inter'; font-size: 1rem; color: #5a5a5a; background: #fff;">
+                Focused / Active State
+            </div>
+        </div>
+
+        <!-- Shapes & Elevation Card -->
+        <div class="sg-card">
+            <h2>Shapes & Elevation</h2>
+            <div class="type-label">Border Radii</div>
+            <div class="btn-group" style="margin-bottom: 30px;">
+                <div style="background: var(--pink); padding: 10px 20px; border-radius: var(--radius-sm); font-size: 0.9rem;">Small (12px)</div>
+                <div style="background: var(--pink); padding: 10px 20px; border-radius: var(--radius-md); font-size: 0.9rem;">Medium (20px)</div>
+                <div style="background: var(--pink); padding: 10px 20px; border-radius: var(--radius-lg); font-size: 0.9rem;">Large (30px)</div>
+                <div style="background: var(--pink); padding: 10px 20px; border-radius: var(--radius-pill); font-size: 0.9rem;">Pill (50px)</div>
+            </div>
+
+            <div class="type-label">Shadows (Elevation)</div>
+            <div style="display: flex; gap: 20px;">
+                <div style="width: 100px; height: 100px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-card); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; text-align: center;">Card<br>Shadow</div>
+                <div style="width: 100px; height: 100px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; text-align: center;">Soft UI<br>Shadow</div>
+                <div style="width: 100px; height: 100px; background: white; border-radius: var(--radius-md); box-shadow: var(--shadow-hover); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; text-align: center;">Hover<br>Shadow</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

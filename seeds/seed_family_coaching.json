@@ -1,0 +1,29 @@
+{
+  "seed_id": "family_coaching_001",
+  "brand_profile": {
+    "industry": "coaching",
+    "brand_type": "service_brand",
+    "audience": ["families", "parents", "private_clients"],
+    "positioning_keywords": ["nahbar", "vertrauensvoll", "warm", "klar"],
+    "tone": ["menschlich", "freundlich", "ermutigend"]
+  },
+  "channels": ["website", "flyer", "one_pager_pdf", "social_post"],
+  "preferences": {
+    "emotionality": 0.8,
+    "expressiveness": 0.25,
+    "boldness": 0.15,
+    "luxury": 0.15,
+    "warmth": 0.9,
+    "playfulness": 0.3,
+    "technicality": 0.05
+  },
+  "expected_recommendation": {
+    "primary_fit": "warm_human",
+    "secondary_fit": "natural_organic",
+    "reasoning": [
+      "starker Bedarf an Vertrauen, Zugänglichkeit und Wärme",
+      "geeignet für Website und Print-Kommunikation im lokalen Kontext",
+      "freundliche Formensprache ohne gestalterische Beliebigkeit"
+    ]
+  }
+}

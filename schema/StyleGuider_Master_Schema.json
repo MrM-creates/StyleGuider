@@ -1,0 +1,679 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://styleguider.app/schema/style-system.schema.json",
+  "title": "StyleGuider Master Schema",
+  "description": "Master schema for StyleGuider style families, brand profiles, design axes, tokens, channel rules, template specifications, export bundles, and validation metadata.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "release_id",
+    "created_at",
+    "style_family",
+    "brand_profile",
+    "design_axes",
+    "tokens",
+    "channel_rules",
+    "template_specs",
+    "export_bundle",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "pattern": "^v?[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semantic version of the schema definition."
+    },
+    "release_id": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Shared release identifier for all exports generated from the same style system."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "locale": {
+      "type": "string",
+      "default": "de-CH"
+    },
+    "style_family": { "$ref": "#/$defs/styleFamily" },
+    "brand_profile": { "$ref": "#/$defs/brandProfile" },
+    "design_axes": { "$ref": "#/$defs/designAxes" },
+    "tokens": { "$ref": "#/$defs/tokens" },
+    "channel_rules": { "$ref": "#/$defs/channelRules" },
+    "template_specs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/templateSpec" }
+    },
+    "export_bundle": { "$ref": "#/$defs/exportBundle" },
+    "validation": { "$ref": "#/$defs/validation" },
+    "governance": { "$ref": "#/$defs/governance" },
+    "notes": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "score0to100": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "stringMap": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "styleFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "category",
+        "summary",
+        "recommended_for",
+        "not_ideal_for",
+        "intent",
+        "axes_profile",
+        "visual_rules",
+        "dos",
+        "donts",
+        "channel_fit",
+        "default_templates"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "minimal_swiss",
+            "modern_editorial",
+            "warm_human",
+            "bold_startup",
+            "premium_luxury",
+            "creative_playful",
+            "natural_organic"
+          ]
+        },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "category": {
+          "type": "string",
+          "enum": ["core", "specialized"]
+        },
+        "summary": { "$ref": "#/$defs/nonEmptyString" },
+        "recommended_for": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "not_ideal_for": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "intent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["brand_effect", "positioning", "tone_keywords"],
+          "properties": {
+            "brand_effect": { "$ref": "#/$defs/nonEmptyString" },
+            "positioning": { "$ref": "#/$defs/nonEmptyString" },
+            "tone_keywords": {
+              "type": "array",
+              "minItems": 3,
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            }
+          }
+        },
+        "axes_profile": { "$ref": "#/$defs/designAxes" },
+        "visual_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "color_principle",
+            "typography_principle",
+            "layout_principle",
+            "shape_principle",
+            "component_principle",
+            "imagery_principle"
+          ],
+          "properties": {
+            "color_principle": { "$ref": "#/$defs/nonEmptyString" },
+            "typography_principle": { "$ref": "#/$defs/nonEmptyString" },
+            "layout_principle": { "$ref": "#/$defs/nonEmptyString" },
+            "shape_principle": { "$ref": "#/$defs/nonEmptyString" },
+            "component_principle": { "$ref": "#/$defs/nonEmptyString" },
+            "imagery_principle": { "$ref": "#/$defs/nonEmptyString" }
+          }
+        },
+        "dos": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "donts": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "channel_fit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["web", "print", "social", "presentation", "image_ai"],
+          "properties": {
+            "web": { "$ref": "#/$defs/channelFit" },
+            "print": { "$ref": "#/$defs/channelFit" },
+            "social": { "$ref": "#/$defs/channelFit" },
+            "presentation": { "$ref": "#/$defs/channelFit" },
+            "image_ai": { "$ref": "#/$defs/channelFit" }
+          }
+        },
+        "default_templates": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "channelFit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["score", "note"],
+      "properties": {
+        "score": { "$ref": "#/$defs/score0to100" },
+        "note": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    },
+    "brandProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "brand_name",
+        "industry",
+        "audience",
+        "values",
+        "personality",
+        "communication_goals",
+        "channel_priority"
+      ],
+      "properties": {
+        "brand_name": { "$ref": "#/$defs/nonEmptyString" },
+        "industry": { "$ref": "#/$defs/nonEmptyString" },
+        "audience": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "values": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "personality": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "communication_goals": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["trust", "awareness", "conversion", "information", "premium_perception", "community", "credibility"]
+          }
+        },
+        "channel_priority": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": ["web", "print", "social", "presentation", "email", "image_ai"]
+          }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "designAxes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "emotionality",
+        "expressiveness",
+        "boldness",
+        "precision",
+        "luxury",
+        "digital_first"
+      ],
+      "properties": {
+        "emotionality": { "$ref": "#/$defs/score0to100" },
+        "expressiveness": { "$ref": "#/$defs/score0to100" },
+        "boldness": { "$ref": "#/$defs/score0to100" },
+        "precision": { "$ref": "#/$defs/score0to100" },
+        "luxury": { "$ref": "#/$defs/score0to100" },
+        "digital_first": { "$ref": "#/$defs/score0to100" }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["color", "typography", "space", "radius", "border", "shadow", "motion", "states"],
+      "properties": {
+        "color": { "$ref": "#/$defs/colorTokens" },
+        "typography": { "$ref": "#/$defs/typographyTokens" },
+        "space": { "$ref": "#/$defs/spaceTokens" },
+        "radius": { "$ref": "#/$defs/tokenScale" },
+        "border": { "$ref": "#/$defs/borderTokens" },
+        "shadow": { "$ref": "#/$defs/stringMap" },
+        "motion": { "$ref": "#/$defs/motionTokens" },
+        "states": { "$ref": "#/$defs/stateTokens" }
+      }
+    },
+    "colorTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "semantic", "interactive"],
+      "properties": {
+        "base": { "$ref": "#/$defs/stringMap" },
+        "semantic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "background",
+            "surface",
+            "surface_alt",
+            "text_primary",
+            "text_muted",
+            "accent",
+            "border",
+            "success",
+            "warning",
+            "error"
+          ],
+          "properties": {
+            "background": { "type": "string" },
+            "surface": { "type": "string" },
+            "surface_alt": { "type": "string" },
+            "text_primary": { "type": "string" },
+            "text_muted": { "type": "string" },
+            "accent": { "type": "string" },
+            "border": { "type": "string" },
+            "success": { "type": "string" },
+            "warning": { "type": "string" },
+            "error": { "type": "string" }
+          }
+        },
+        "interactive": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "button_primary_bg",
+            "button_primary_text",
+            "button_secondary_bg",
+            "button_secondary_text",
+            "input_bg",
+            "input_border",
+            "input_focus_ring",
+            "link",
+            "link_hover"
+          ],
+          "properties": {
+            "button_primary_bg": { "type": "string" },
+            "button_primary_text": { "type": "string" },
+            "button_secondary_bg": { "type": "string" },
+            "button_secondary_text": { "type": "string" },
+            "input_bg": { "type": "string" },
+            "input_border": { "type": "string" },
+            "input_focus_ring": { "type": "string" },
+            "link": { "type": "string" },
+            "link_hover": { "type": "string" }
+          }
+        }
+      }
+    },
+    "typographyTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["font_family", "font_size", "font_weight", "line_height", "letter_spacing", "roles"],
+      "properties": {
+        "font_family": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["display", "heading", "body", "ui"],
+          "properties": {
+            "display": { "type": "string" },
+            "heading": { "type": "string" },
+            "body": { "type": "string" },
+            "ui": { "type": "string" }
+          }
+        },
+        "font_size": { "$ref": "#/$defs/stringMap" },
+        "font_weight": { "$ref": "#/$defs/stringMap" },
+        "line_height": { "$ref": "#/$defs/stringMap" },
+        "letter_spacing": { "$ref": "#/$defs/stringMap" },
+        "roles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hero_title", "section_title", "card_title", "body_text", "label", "caption"],
+          "properties": {
+            "hero_title": { "type": "string" },
+            "section_title": { "type": "string" },
+            "card_title": { "type": "string" },
+            "body_text": { "type": "string" },
+            "label": { "type": "string" },
+            "caption": { "type": "string" }
+          }
+        }
+      }
+    },
+    "spaceTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scale", "container", "section_padding", "component_gap"],
+      "properties": {
+        "scale": { "$ref": "#/$defs/stringMap" },
+        "container": { "$ref": "#/$defs/stringMap" },
+        "section_padding": { "$ref": "#/$defs/stringMap" },
+        "component_gap": { "$ref": "#/$defs/stringMap" }
+      }
+    },
+    "tokenScale": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "number"]
+      }
+    },
+    "borderTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "style"],
+      "properties": {
+        "width": { "$ref": "#/$defs/stringMap" },
+        "style": { "$ref": "#/$defs/stringMap" }
+      }
+    },
+    "motionTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duration", "easing"],
+      "properties": {
+        "duration": { "$ref": "#/$defs/stringMap" },
+        "easing": { "$ref": "#/$defs/stringMap" }
+      }
+    },
+    "stateTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hover", "active", "disabled", "focus", "success", "error"],
+      "properties": {
+        "hover": { "$ref": "#/$defs/stringMap" },
+        "active": { "$ref": "#/$defs/stringMap" },
+        "disabled": { "$ref": "#/$defs/stringMap" },
+        "focus": { "$ref": "#/$defs/stringMap" },
+        "success": { "$ref": "#/$defs/stringMap" },
+        "error": { "$ref": "#/$defs/stringMap" }
+      }
+    },
+    "channelRules": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["web", "print", "social", "presentation", "image_ai"],
+      "properties": {
+        "web": { "$ref": "#/$defs/channelRule" },
+        "print": { "$ref": "#/$defs/channelRule" },
+        "social": { "$ref": "#/$defs/channelRule" },
+        "presentation": { "$ref": "#/$defs/channelRule" },
+        "image_ai": { "$ref": "#/$defs/channelRule" }
+      }
+    },
+    "channelRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goal", "required_rules", "overrides", "export_targets"],
+      "properties": {
+        "goal": { "$ref": "#/$defs/nonEmptyString" },
+        "required_rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": true,
+          "description": "Channel-specific token or rule overrides."
+        },
+        "export_targets": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "design_tokens_json",
+              "theme_json",
+              "css_variables",
+              "brand_guide_pdf",
+              "quick_style_sheet",
+              "print_spec",
+              "web_template_spec",
+              "print_template_spec",
+              "social_template_spec",
+              "presentation_template_spec",
+              "ui_code_agent_prompt",
+              "brand_copy_agent_prompt",
+              "image_style_pack"
+            ]
+          }
+        }
+      }
+    },
+    "templateSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "template_id",
+        "label",
+        "channel",
+        "goal",
+        "format",
+        "layout_zones",
+        "content_slots",
+        "component_rules",
+        "hierarchy_rules",
+        "export_rules"
+      ],
+      "properties": {
+        "template_id": { "$ref": "#/$defs/nonEmptyString" },
+        "label": { "$ref": "#/$defs/nonEmptyString" },
+        "channel": {
+          "type": "string",
+          "enum": ["web", "print", "social", "presentation", "image_ai"]
+        },
+        "goal": {
+          "type": "string",
+          "enum": ["awareness", "information", "conversion", "trust", "credibility", "showcase"]
+        },
+        "format": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["ratio_or_size", "orientation"],
+          "properties": {
+            "ratio_or_size": { "$ref": "#/$defs/nonEmptyString" },
+            "orientation": {
+              "type": "string",
+              "enum": ["portrait", "landscape", "square", "responsive", "free"]
+            },
+            "safe_area": { "type": "string" },
+            "bleed": { "type": "string" },
+            "resolution": { "type": "string" }
+          }
+        },
+        "layout_zones": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "content_slots": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["slot_id", "required", "content_type"],
+            "properties": {
+              "slot_id": { "$ref": "#/$defs/nonEmptyString" },
+              "required": { "type": "boolean" },
+              "content_type": {
+                "type": "string",
+                "enum": ["headline", "subheadline", "body", "cta", "image", "logo", "contact", "proof", "offer", "footer"]
+              },
+              "max_length": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "component_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["allowed_components", "forbidden_components"],
+          "properties": {
+            "allowed_components": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            },
+            "forbidden_components": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            }
+          }
+        },
+        "hierarchy_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["headline_priority", "image_text_balance", "cta_priority"],
+          "properties": {
+            "headline_priority": {
+              "type": "string",
+              "enum": ["low", "medium", "high"]
+            },
+            "image_text_balance": {
+              "type": "string",
+              "enum": ["image_led", "balanced", "text_led"]
+            },
+            "cta_priority": {
+              "type": "string",
+              "enum": ["none", "low", "medium", "high"]
+            }
+          }
+        },
+        "export_rules": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file_types"],
+          "properties": {
+            "file_types": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "enum": ["json", "css", "pdf", "png", "jpg", "svg", "md"]
+              }
+            },
+            "pdf_profile": {
+              "type": "string",
+              "enum": ["none", "pdf_x4", "print_high_quality"]
+            }
+          }
+        }
+      }
+    },
+    "exportBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system_export", "human_export", "channel_export", "ai_export", "manifest"],
+      "properties": {
+        "system_export": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["design_tokens_json", "theme_json", "css_variables"]
+          }
+        },
+        "human_export": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["brand_guide_pdf", "quick_style_sheet", "do_dont_sheet"]
+          }
+        },
+        "channel_export": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["web_template_spec", "print_template_spec", "social_template_spec", "presentation_template_spec"]
+          }
+        },
+        "ai_export": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["ui_code_agent_prompt", "brand_copy_agent_prompt", "image_style_pack"]
+          }
+        },
+        "manifest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["release_id", "style_family_id", "artifact_paths"],
+          "properties": {
+            "release_id": { "type": "string" },
+            "style_family_id": { "type": "string" },
+            "artifact_paths": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            }
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["wcag_target", "required_states_present", "template_coverage", "export_completeness"],
+      "properties": {
+        "wcag_target": {
+          "type": "string",
+          "enum": ["wcag_2_2_aa"]
+        },
+        "required_states_present": { "type": "boolean" },
+        "template_coverage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["web", "print", "social", "presentation", "image_ai"]
+          }
+        },
+        "export_completeness": {
+          "type": "string",
+          "enum": ["mvp", "expanded", "full"]
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "owner": { "type": "string" },
+        "approval_status": {
+          "type": "string",
+          "enum": ["draft", "review", "approved"]
+        },
+        "breaking_change": { "type": "boolean" }
+      }
+    }
+  }
+}

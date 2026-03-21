@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StyleGuider | Design System Generator</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="global-header">
+        <div class="brand-block">
+          <span class="eyebrow">StyleGuider fuer Designer & Entwickler</span>
+          <h1>Erstelle dein Brand-System in 3 klaren Schritten</h1>
+        </div>
+        <div class="header-actions">
+          <span class="status-chip">
+            <span class="status-dot"></span>
+            Live Preview aktiv
+          </span>
+          <button class="export-btn" id="export-btn-header">Export oeffnen</button>
+        </div>
+      </header>
+
+      <div class="app-shell">
+        <aside class="sidebar">
+          <div class="sidebar-intro">
+            <p>
+              Du waehlst eine Stilfamilie, passt Tokens an und exportierst alles fuer Web & Print.
+            </p>
+          </div>
+
+          <nav class="stepper-nav" aria-label="Schritt Navigation">
+            <button class="step-btn active" data-step="style" aria-current="step">
+              <span class="step-index">1</span>
+              Stil waehlen
+            </button>
+            <button class="step-btn" data-step="tokens">
+              <span class="step-index">2</span>
+              Tokens anpassen
+            </button>
+            <button class="step-btn" data-step="export">
+              <span class="step-index">3</span>
+              Exportieren
+            </button>
+          </nav>
+
+          <div class="sidebar-content">
+            <section class="step-panel active" data-step-panel="style">
+              <div class="control-group">
+                <span class="control-label">Design Preset</span>
+                <label for="style-presets-select" class="sr-only">Style Preset auswaehlen</label>
+                <select id="style-presets-select" class="fs-input" aria-describedby="style-help"></select>
+                <p id="style-help" class="control-help">
+                  Das Preset setzt Farbe, Typografie und Grundform fuer deine Marke.
+                </p>
+              </div>
+
+              <div class="control-group">
+                <span class="control-label">Channel Context</span>
+                <div id="channel-presets-container" class="channel-toggle" role="group" aria-label="Channel waehlen">
+                  <button class="theme-btn active" data-channel="web">Web</button>
+                  <button class="theme-btn" data-channel="print">Print</button>
+                </div>
+              </div>
+
+              <button class="step-primary-btn" data-go-step="tokens">Weiter zu Tokens</button>
+            </section>
+
+            <section class="step-panel" data-step-panel="tokens">
+              <div class="control-group">
+                <span class="control-label">Core Colors</span>
+                <div class="token-input-group">
+                  <label for="bg-color">Background</label>
+                  <input type="color" id="bg-color" value="#FFFCF9" data-var="--pv-bg-main" />
+                </div>
+                <div class="token-input-group">
+                  <label for="surface-color">Surface</label>
+                  <input type="color" id="surface-color" value="#FFFFFF" data-var="--pv-surface" />
+                </div>
+                <div class="token-input-group">
+                  <label for="primary-color">Primary</label>
+                  <input type="color" id="primary-color" value="#f5a8a0" data-var="--pv-color-1" />
+                </div>
+                <div class="token-input-group">
+                  <label for="secondary-color">Secondary</label>
+                  <input type="color" id="secondary-color" value="#a8d7d8" data-var="--pv-color-2" />
+                </div>
+                <div class="token-input-group">
+                  <label for="text-dark-color">Text Dark</label>
+                  <input type="color" id="text-dark-color" value="#3a3a3a" data-var="--pv-text-dark" />
+                </div>
+              </div>
+
+              <details class="advanced-accordion">
+                <summary>Typography & Form</summary>
+
+                <div class="control-group">
+                  <span class="control-label">Typography</span>
+                  <div class="token-input-group">
+                    <label for="font-heading">Heading</label>
+                    <select id="font-heading" data-var="--pv-font-heading">
+                      <option value="'Outfit', sans-serif">Outfit</option>
+                      <option value="'Inter', sans-serif">Inter</option>
+                      <option value="'Space Grotesk', sans-serif">Space Grotesk</option>
+                      <option value="'Playfair Display', serif">Playfair Display</option>
+                    </select>
+                  </div>
+                  <div class="token-input-group">
+                    <label for="font-body">Body</label>
+                    <select id="font-body" data-var="--pv-font-body">
+                      <option value="'Inter', sans-serif">Inter</option>
+                      <option value="'Outfit', sans-serif">Outfit</option>
+                      <option value="system-ui, sans-serif">System Default</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="control-group">
+                  <span class="control-label">Border Radius</span>
+                  <label for="radius-slider" class="sr-only">Radius einstellen</label>
+                  <input type="range" id="radius-slider" min="0" max="50" value="30" />
+                  <div class="range-hints">
+                    <span>Sharp</span>
+                    <span>Soft</span>
+                    <span>Pill</span>
+                  </div>
+                </div>
+              </details>
+
+              <button class="step-primary-btn" data-go-step="export">Weiter zu Export</button>
+            </section>
+
+            <section class="step-panel" data-step-panel="export">
+              <p class="control-help">
+                Exportiere dein aktuelles Set als CSS Variablen, JSON Tokens und AI Prompts.
+              </p>
+              <button class="step-primary-btn" id="export-btn">Export Design System</button>
+              <button class="step-link-btn" data-go-step="tokens">Zurueck zu Tokens</button>
+            </section>
+          </div>
+        </aside>
+
+        <main class="canvas-wrapper">
+          <header class="canvas-header">
+            <div>
+              <div class="canvas-title">Live Preview</div>
+              <p class="canvas-subtitle" id="step-context-text">Schritt 1: Waehle die passende Stilfamilie.</p>
+            </div>
+          </header>
+
+          <div class="preview-canvas channel-web" id="preview-canvas">
+            <div class="sg-container">
+              <div class="sg-header">
+                <h1 id="preview-brand-title">Brand / UI Title</h1>
+                <p>UI Styleguide & Design System</p>
+              </div>
+
+              <div class="sg-grid">
+                <div class="sg-card">
+                  <h2>Brand Colors</h2>
+                  <div class="color-row">
+                    <div class="color-swatch" id="swatch-1"></div>
+                    <div class="color-info">
+                      <span class="color-name">Primary Accent</span>
+                      <span class="color-hex">Hex: <span class="hex-val" id="hex-1">#f5a8a0</span></span>
+                    </div>
+                  </div>
+                  <div class="color-row">
+                    <div class="color-swatch" id="swatch-2"></div>
+                    <div class="color-info">
+                      <span class="color-name">Secondary Accent</span>
+                      <span class="color-hex">Hex: <span class="hex-val" id="hex-2">#a8d7d8</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sg-card">
+                  <h2>Text & Surfaces</h2>
+                  <div class="color-row">
+                    <div class="color-swatch" id="swatch-text"></div>
+                    <div class="color-info">
+                      <span class="color-name">Text Dark</span>
+                      <span class="color-hex">Hex: <span class="hex-val" id="hex-text">#3a3a3a</span></span>
+                    </div>
+                  </div>
+                  <div class="color-row">
+                    <div class="color-swatch swatch-surface" id="swatch-surface"></div>
+                    <div class="color-info">
+                      <span class="color-name">Surface Background</span>
+                      <span class="color-hex">Hex: <span class="hex-val" id="hex-surface">#FFFFFF</span></span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sg-card">
+                  <h2>Typography</h2>
+                  <div class="type-example">
+                    <div class="type-label">
+                      Heading Font
+                      <span id="font-family-heading-display" class="font-family-display"></span>
+                    </div>
+                    <div class="type-showcase">
+                      <h1>Aa</h1>
+                      <h3>The quick brown fox jumps...</h3>
+                    </div>
+                  </div>
+                  <div class="type-example">
+                    <div class="type-label">
+                      Body Font
+                      <span id="font-family-body-display" class="font-family-display"></span>
+                    </div>
+                    <div class="type-showcase">
+                      <p class="type-aa">Aa</p>
+                      <p>The quick brown fox jumps over the lazy dog. Lorem ipsum dolor sit amet.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sg-card">
+                  <h2>UI Components</h2>
+                  <div class="type-label">Buttons</div>
+                  <div class="btn-group">
+                    <button class="btn btn-primary">Primary Action</button>
+                    <button class="btn btn-secondary">Secondary</button>
+                  </div>
+
+                  <div class="type-label input-label">Input Elements</div>
+                  <div class="input-example">Standard Input Field</div>
+                  <div class="input-example active">Focused / Active State</div>
+                </div>
+
+                <div class="sg-card sg-wide">
+                  <h2>Shapes & Elevation</h2>
+                  <div class="shape-row">
+                    <div class="shape-box radius-sm">Small</div>
+                    <div class="shape-box radius-md">Medium</div>
+                    <div class="shape-box radius-lg">Large</div>
+                    <div class="shape-box radius-pill">Pill</div>
+                  </div>
+
+                  <div class="shadow-row">
+                    <div class="shadow-box shadow-soft">
+                      Soft Shadow
+                      <span id="shadow-val-soft" class="shadow-val"></span>
+                    </div>
+                    <div class="shadow-box shadow-card">
+                      Card Shadow
+                      <span id="shadow-val-card" class="shadow-val"></span>
+                    </div>
+                    <div class="shadow-box shadow-hover">
+                      Hover Shadow
+                      <span id="shadow-val-hover" class="shadow-val"></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <footer class="global-footer">
+        <span>StyleGuider hilft dir, konsistente Brand-Systeme schneller auszurollen.</span>
+        <nav aria-label="Footer links">
+          <a href="#" role="button">Hilfe</a>
+          <a href="#" role="button">Kontakt</a>
+          <a href="#" role="button">Status</a>
+        </nav>
+      </footer>
+
+      <div id="export-modal" class="modal-overlay hidden">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+          <header class="modal-header">
+            <h2 id="export-modal-title">Export Design System</h2>
+            <button id="close-modal" class="close-btn" aria-label="Export Modal schliessen">&times;</button>
+          </header>
+          <div class="modal-tabs">
+            <button class="tab-btn active" data-tab="css">CSS Variables</button>
+            <button class="tab-btn" data-tab="json">Design Tokens</button>
+            <button class="tab-btn" data-tab="ai">AI Agent Prompt</button>
+            <button class="tab-btn" data-tab="image">Image Gen AI</button>
+          </div>
+          <div class="modal-body">
+            <div class="tab-content active" id="tab-css">
+              <pre><code id="export-css-code"></code></pre>
+              <button class="copy-btn" data-target="export-css-code">Copy CSS</button>
+            </div>
+            <div class="tab-content" id="tab-json">
+              <pre><code id="export-json-code"></code></pre>
+              <button class="copy-btn" data-target="export-json-code">Copy JSON</button>
+            </div>
+            <div class="tab-content" id="tab-ai">
+              <pre><code id="export-ai-code"></code></pre>
+              <button class="copy-btn" data-target="export-ai-code">Copy Prompt</button>
+            </div>
+            <div class="tab-content" id="tab-image">
+              <pre><code id="export-image-code"></code></pre>
+              <button class="copy-btn" data-target="export-image-code">Copy Prompt</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

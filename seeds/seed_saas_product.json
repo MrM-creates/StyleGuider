@@ -1,0 +1,29 @@
+{
+  "seed_id": "saas_product_001",
+  "brand_profile": {
+    "industry": "saas",
+    "brand_type": "digital_product",
+    "audience": ["teams", "buyers", "decision_makers"],
+    "positioning_keywords": ["modern", "effizient", "skalierbar", "klar"],
+    "tone": ["direkt", "kompetent", "fortschrittlich"]
+  },
+  "channels": ["website", "landingpage", "pitchdeck", "social_ad"],
+  "preferences": {
+    "emotionality": 0.25,
+    "expressiveness": 0.55,
+    "boldness": 0.85,
+    "luxury": 0.1,
+    "warmth": 0.15,
+    "playfulness": 0.2,
+    "technicality": 0.85
+  },
+  "expected_recommendation": {
+    "primary_fit": "bold_startup",
+    "secondary_fit": "minimal_swiss",
+    "reasoning": [
+      "digitale Klarheit und starke Conversion-Logik",
+      "hoher Bedarf an modularer, state-reicher UI",
+      "geeignet für Produktmarketing und pitchfähige Kommunikation"
+    ]
+  }
+}

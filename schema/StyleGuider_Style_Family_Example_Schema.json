@@ -1,0 +1,476 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://styleguider.app/schema/style-family-example.schema.json",
+  "title": "StyleGuider Style Family Example Schema",
+  "description": "Schema for repo-level example objects representing style family examples and a collection wrapper.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/styleFamilyExample"
+    },
+    {
+      "$ref": "#/$defs/styleFamilyCollection"
+    }
+  ],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hexColor": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "axisScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "styleFamilyCore": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "summary",
+        "status",
+        "brand_keywords",
+        "suitable_for",
+        "not_recommended_for"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": [
+            "minimal_swiss",
+            "modern_editorial",
+            "warm_human",
+            "bold_startup",
+            "premium_luxury",
+            "creative_playful",
+            "natural_organic"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "summary": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft_mvp",
+            "draft",
+            "approved"
+          ]
+        },
+        "brand_keywords": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "suitable_for": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "not_recommended_for": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    "designAxes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "emotionality",
+        "expressiveness",
+        "boldness",
+        "luxury",
+        "warmth",
+        "playfulness",
+        "technicality"
+      ],
+      "properties": {
+        "emotionality": {
+          "$ref": "#/$defs/axisScore"
+        },
+        "expressiveness": {
+          "$ref": "#/$defs/axisScore"
+        },
+        "boldness": {
+          "$ref": "#/$defs/axisScore"
+        },
+        "luxury": {
+          "$ref": "#/$defs/axisScore"
+        },
+        "warmth": {
+          "$ref": "#/$defs/axisScore"
+        },
+        "playfulness": {
+          "$ref": "#/$defs/axisScore"
+        },
+        "technicality": {
+          "$ref": "#/$defs/axisScore"
+        }
+      }
+    },
+    "typeRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family",
+        "weight"
+      ],
+      "properties": {
+        "family": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "weight": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 900
+        },
+        "tracking": {
+          "type": "number"
+        },
+        "line_height": {
+          "type": "number",
+          "minimum": 1.0,
+          "maximum": 3.0
+        },
+        "letter_spacing": {
+          "type": "number"
+        }
+      }
+    },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "color_roles",
+        "typography_roles",
+        "spacing_scale",
+        "shape_scale",
+        "elevation_scale"
+      ],
+      "properties": {
+        "color_roles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "background",
+            "surface",
+            "text_primary",
+            "text_secondary",
+            "primary",
+            "accent",
+            "border",
+            "focus",
+            "success",
+            "warning",
+            "error"
+          ],
+          "properties": {
+            "background": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "surface": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "text_primary": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "text_secondary": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "primary": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "accent": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "border": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "focus": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "success": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "warning": {
+              "$ref": "#/$defs/hexColor"
+            },
+            "error": {
+              "$ref": "#/$defs/hexColor"
+            }
+          }
+        },
+        "typography_roles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "display",
+            "heading",
+            "body",
+            "label",
+            "caption"
+          ],
+          "properties": {
+            "display": {
+              "$ref": "#/$defs/typeRole"
+            },
+            "heading": {
+              "$ref": "#/$defs/typeRole"
+            },
+            "body": {
+              "$ref": "#/$defs/typeRole"
+            },
+            "label": {
+              "$ref": "#/$defs/typeRole"
+            },
+            "caption": {
+              "$ref": "#/$defs/typeRole"
+            }
+          }
+        },
+        "spacing_scale": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "base_unit",
+            "steps_px",
+            "density"
+          ],
+          "properties": {
+            "base_unit": {
+              "type": "integer",
+              "minimum": 2,
+              "maximum": 16
+            },
+            "steps_px": {
+              "type": "array",
+              "minItems": 4,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "density": {
+              "type": "string"
+            }
+          }
+        },
+        "shape_scale": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "radius_px",
+            "default_radius",
+            "corner_style"
+          ],
+          "properties": {
+            "radius_px": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "default_radius": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "corner_style": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        },
+        "elevation_scale": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "shadow_levels",
+            "default_level"
+          ],
+          "properties": {
+            "shadow_levels": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/nonEmptyString"
+              }
+            },
+            "default_level": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        }
+      }
+    },
+    "stringOrPrimitiveArrayObject": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "number",
+                "integer",
+                "boolean"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "styleFamilyExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "object_type",
+        "style_family",
+        "design_axes",
+        "tokens",
+        "channel_rules",
+        "template_specs",
+        "export_bundle",
+        "dos",
+        "donts",
+        "governance"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "object_type": {
+          "const": "style_family_example"
+        },
+        "style_family": {
+          "$ref": "#/$defs/styleFamilyCore"
+        },
+        "design_axes": {
+          "$ref": "#/$defs/designAxes"
+        },
+        "tokens": {
+          "$ref": "#/$defs/tokens"
+        },
+        "channel_rules": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/stringOrPrimitiveArrayObject"
+          }
+        },
+        "template_specs": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/stringOrPrimitiveArrayObject"
+          }
+        },
+        "export_bundle": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "boolean"
+          }
+        },
+        "dos": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "donts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "governance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "review_required",
+            "accessibility_target",
+            "print_guidance",
+            "updated_at"
+          ],
+          "properties": {
+            "review_required": {
+              "type": "boolean"
+            },
+            "accessibility_target": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "print_guidance": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        }
+      }
+    },
+    "styleFamilyCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "object_type",
+        "count",
+        "items"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "object_type": {
+          "const": "style_family_collection"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/styleFamilyExample"
+          }
+        }
+      }
+    }
+  }
+}

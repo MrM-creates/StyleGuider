@@ -1,0 +1,29 @@
+{
+  "seed_id": "photography_portfolio_001",
+  "brand_profile": {
+    "industry": "photography",
+    "brand_type": "personal_brand",
+    "audience": ["art_buyers", "private_clients", "curated_audience"],
+    "positioning_keywords": ["hochwertig", "ruhig", "kuratiert", "ästhetisch"],
+    "tone": ["souverän", "visuell", "zurückhaltend"]
+  },
+  "channels": ["website", "flyer", "portfolio_pdf", "business_card"],
+  "preferences": {
+    "emotionality": 0.55,
+    "expressiveness": 0.4,
+    "boldness": 0.2,
+    "luxury": 0.7,
+    "warmth": 0.35,
+    "playfulness": 0.05,
+    "technicality": 0.2
+  },
+  "expected_recommendation": {
+    "primary_fit": "modern_editorial",
+    "secondary_fit": "premium_luxury",
+    "reasoning": [
+      "starke Bildführung und typografische Ruhe",
+      "geeignet für Portfolio, Print und kuratierte Website",
+      "hohe Wertigkeit ohne aggressive Conversion-Logik"
+    ]
+  }
+}
