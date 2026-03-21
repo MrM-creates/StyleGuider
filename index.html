@@ -139,8 +139,7 @@
               <p class="control-help">
                 Exportiere dein aktuelles Set als CSS-Variablen, Design-Tokens und KI-Prompts.
               </p>
-              <button class="step-primary-btn" id="export-btn">PDF direkt drucken</button>
-              <button class="step-link-btn" id="advanced-export-btn">Weitere Exportformate anzeigen</button>
+              <button class="step-primary-btn" id="export-btn">Design-System exportieren</button>
               <button class="step-link-btn" data-go-step="tokens">Zurück zu Attributen</button>
               <button class="step-link-btn" data-go-step="style">Stil neu wählen</button>
             </section>
@@ -159,6 +158,11 @@
                   <h1 id="preview-brand-title">Marke / UI Titel</h1>
                   <button class="info-btn" id="style-info-btn" aria-expanded="false" aria-controls="style-info-card" title="Stil-Info">
                     i
+                  </button>
+                  <button class="info-btn icon-btn" id="pdf-save-btn" aria-label="PDF speichern" title="PDF speichern">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M12 3v10m0 0 4-4m-4 4-4-4M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+                    </svg>
                   </button>
                 </div>
                 <p id="preview-style-summary" class="preview-style-summary"></p>
@@ -319,8 +323,6 @@
             <button class="tab-btn active" data-tab="css">CSS-Variablen</button>
             <button class="tab-btn" data-tab="json">Design-Tokens</button>
             <button class="tab-btn" data-tab="ai">KI-Agent Prompt</button>
-            <button class="tab-btn" data-tab="image">Bild-KI Prompt</button>
-            <button class="tab-btn" data-tab="pdf">PDF (2 Seiten)</button>
           </div>
           <div class="modal-body">
             <div class="tab-content active" id="tab-css">
@@ -334,18 +336,6 @@
             <div class="tab-content" id="tab-ai">
               <pre><code id="export-ai-code"></code></pre>
               <button class="copy-btn" data-target="export-ai-code">Kopieren</button>
-            </div>
-            <div class="tab-content" id="tab-image">
-              <pre><code id="export-image-code"></code></pre>
-              <button class="copy-btn" data-target="export-image-code">Kopieren</button>
-            </div>
-            <div class="tab-content" id="tab-pdf">
-              <p class="pdf-tab-copy">Exportiert ein 2-seitiges PDF mit Stilbeschreibung (Seite 1) und kanalspezifischen Spezifikationen (Seite 2).</p>
-              <p class="pdf-tab-note">Hinweis: Der Zielordner wird vom Browser gesteuert. Für eine manuelle Ordnerwahl aktiviere im Browser „Bei jedem Download nachfragen“.</p>
-              <div class="pdf-export-actions">
-                <button class="step-primary-btn pdf-export-btn" id="export-pdf-web">PDF Export Web (2 Seiten)</button>
-                <button class="step-primary-btn pdf-export-btn" id="export-pdf-print">PDF Export Print (2 Seiten)</button>
-              </div>
             </div>
           </div>
         </div>

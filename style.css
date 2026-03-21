@@ -543,6 +543,23 @@ input[type='range'] {
   color: var(--pv-color-1);
 }
 
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+}
+
+.icon-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .sg-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -856,7 +873,7 @@ input[type='range'] {
 
 .modal-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   border-bottom: 1px solid #263445;
 }
 
@@ -914,30 +931,6 @@ input[type='range'] {
   font-size: 0.74rem;
   padding: 6px 10px;
   cursor: pointer;
-}
-
-.pdf-tab-copy {
-  margin: 0 0 14px;
-  color: #b8c9db;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.pdf-tab-note {
-  margin: -6px 0 14px;
-  color: #93abc4;
-  font-size: 0.82rem;
-  line-height: 1.45;
-}
-
-.pdf-export-actions {
-  display: grid;
-  gap: 10px;
-  max-width: 340px;
-}
-
-.pdf-export-btn {
-  margin-top: 0;
 }
 
 .sr-only {

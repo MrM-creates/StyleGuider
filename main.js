@@ -1,4 +1,6 @@
 import './style.css';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { STYLES } from './styles.js';
 
 const CUSTOM_STYLES_STORAGE_KEY = 'styleguider_custom_styles_v1';
@@ -571,7 +573,7 @@ function initUI() {
       const stepId = btn.dataset.step;
       setStep(stepId);
       if (stepId === 'export') {
-        exportStylePdf(currentChannel);
+        openModal();
       }
     });
   });
@@ -616,14 +618,12 @@ if (styleInfoBtn && styleInfoCard) {
 }
 
 const directExportBtn = document.getElementById('export-btn');
-const advancedExportBtn = document.getElementById('advanced-export-btn');
+const pdfSaveBtn = document.getElementById('pdf-save-btn');
 const exportModal = document.getElementById('export-modal');
 const closeModalBtn = document.getElementById('close-modal');
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 const copyBtns = document.querySelectorAll('.copy-btn');
-const exportPdfWebBtn = document.getElementById('export-pdf-web');
-const exportPdfPrintBtn = document.getElementById('export-pdf-print');
 
 function generateExports() {
   try {
@@ -654,7 +654,6 @@ function generateExports() {
   --radius-lg: ${live.radius_lg};
   --radius-pill: ${live.radius_pill};
 }`;
-
     document.getElementById('export-css-code').innerText = cssString;
 
     const jsonString = JSON.stringify(
@@ -701,18 +700,7 @@ RULES:
 
 AVOID:
 - ${(currentStyleObj.donts || []).join('\n- ')}`;
-
     document.getElementById('export-ai-code').innerText = aiPrompt;
-
-    const mood = (currentStyleObj.style_family?.brand_keywords || []).join(', ');
-    const imagePrompt = `/imagine prompt: High-end layout design element, website photography or print flyer photography depending on context, vector illustration style.
-Mood: ${mood}.
-Color Palette: ${live.background}, ${live.primary}, ${live.surface}.
-Aesthetic: clean lines, modern web design, highly detailed, 8k resolution, dribbble style --ar ${
-      currentChannel === 'web' ? '16:9' : '3:4'
-    } --v 6.0`;
-
-    document.getElementById('export-image-code').innerText = imagePrompt;
   } catch (err) {
     console.error('Export Generator failed:', err);
     alert('Export fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.');
@@ -739,7 +727,7 @@ function getChannelSpecData(styleObj, targetChannel) {
   };
 }
 
-function buildPdfExportMarkup(styleObj, targetChannel) {
+function buildPdfDescriptionPage(styleObj, targetChannel) {
   const info = handbookInfoFor(styleObj);
   const live = getLiveExportTokens();
   const channelData = getChannelSpecData(styleObj, targetChannel);
@@ -785,91 +773,56 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
     )
     .join('');
 
-  return `<!doctype html>
-<html lang="de">
-  <head>
-    <meta charset="utf-8" />
-    <title>StyleGuider Export - ${escapeHtml(styleObj.style_family.name)} (${escapeHtml(channelData.label)})</title>
+  const page = document.createElement('section');
+  page.style.cssText = 'width: 1200px; padding: 24px; background: #ffffff;';
+  page.innerHTML = `
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-      @page { size: A4; margin: 14mm; }
-      :root {
-        --pdf-bg-main: ${live.background};
-        --pdf-surface: ${live.surface};
-        --pdf-text-dark: ${live.text_primary};
-        --pdf-text-main: ${live.text_secondary};
-        --pdf-primary: ${live.primary};
-        --pdf-accent: ${live.accent};
-        --pdf-font-heading: ${live.heading_font};
-        --pdf-font-body: ${live.body_font};
-        --pdf-radius-md: ${live.radius_md};
+      .pdf-sheet {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 18px;
+        padding: 24px;
+        background: ${live.background};
+        color: ${live.text_secondary};
+        font-family: ${live.body_font};
       }
-      * {
-        box-sizing: border-box;
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
-      }
-      body {
+      .pdf-headline {
         margin: 0;
-        font-family: var(--pdf-font-body), Inter, Arial, sans-serif;
-        color: var(--pdf-text-main);
-        line-height: 1.45;
-        background: var(--pdf-bg-main);
-      }
-      .pdf-page {
-        page-break-after: always;
-      }
-      .pdf-page:last-child {
-        page-break-after: auto;
-      }
-      .pdf-header {
-        border-bottom: 2px solid var(--pdf-primary);
-        padding-bottom: 10px;
-        margin-bottom: 16px;
-      }
-      .pdf-kicker {
-        margin: 0 0 6px;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #4b5563;
-      }
-      h1 {
-        margin: 0;
-        font-size: 26px;
-        line-height: 1.2;
-        color: var(--pdf-text-dark);
-        font-family: var(--pdf-font-heading), Inter, Arial, sans-serif;
+        font-size: 38px;
+        line-height: 1.1;
+        color: ${live.text_primary};
+        font-family: ${live.heading_font};
       }
       .pdf-meta {
-        margin: 8px 0 0;
-        font-size: 12px;
-        color: #4b5563;
+        margin: 10px 0 0;
+        font-size: 15px;
+        color: ${live.text_secondary};
       }
       .pdf-grid {
+        margin-top: 16px;
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
       }
       .pdf-card {
-        border: 1px solid #cfd8e3;
-        border-radius: 10px;
-        padding: 10px 12px;
-        background: var(--pdf-surface);
+        border: 1px solid rgba(0, 0, 0, 0.14);
+        border-radius: 12px;
+        background: ${live.surface};
+        padding: 12px;
       }
       .pdf-card.full {
         grid-column: 1 / -1;
       }
-      h2 {
-        margin: 0 0 8px;
-        font-size: 14px;
+      .pdf-card h3 {
+        margin: 0 0 6px;
+        font-size: 13px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
-        color: #374151;
+        color: ${live.text_primary};
       }
-      p {
+      .pdf-card p {
         margin: 0;
-        font-size: 12px;
+        font-size: 14px;
+        line-height: 1.4;
       }
       .pdf-list {
         margin: 0;
@@ -879,231 +832,282 @@ function buildPdfExportMarkup(styleObj, targetChannel) {
         gap: 6px;
       }
       .pdf-list li {
-        font-size: 12px;
         display: grid;
         gap: 2px;
       }
       .pdf-list span {
-        color: #4b5563;
+        font-size: 12px;
+        color: ${live.text_secondary};
       }
       .pdf-list strong {
-        font-weight: 600;
-        color: var(--pdf-text-dark);
-      }
-      .pdf-empty {
-        font-size: 12px;
-        color: #6b7280;
-      }
-      .pdf-note {
-        margin-top: 8px;
-        font-size: 12px;
+        font-size: 14px;
+        color: ${live.text_primary};
       }
       .swatch-grid {
+        margin-top: 8px;
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 10px;
+        gap: 8px;
       }
       .swatch-item {
         display: grid;
-        grid-template-columns: 24px 1fr;
-        align-items: center;
+        grid-template-columns: 22px 1fr;
         gap: 8px;
+        align-items: center;
       }
       .swatch-dot {
-        width: 24px;
-        height: 24px;
+        width: 22px;
+        height: 22px;
         border-radius: 50%;
-        border: 1px solid rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(0, 0, 0, 0.24);
       }
       .swatch-item span,
       .swatch-item strong {
         display: block;
-        font-size: 11px;
+        line-height: 1.2;
       }
       .swatch-item span {
-        color: #4b5563;
+        font-size: 11px;
       }
-      .type-preview h3 {
-        margin: 0;
-        font-family: var(--pdf-font-heading), Inter, Arial, sans-serif;
-        color: var(--pdf-text-dark);
-        font-size: 24px;
-      }
-      .type-preview p {
-        margin: 8px 0 0;
-        font-family: var(--pdf-font-body), Inter, Arial, sans-serif;
-      }
-      .component-row {
-        margin-top: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .preview-btn {
-        border: 0;
-        border-radius: var(--pdf-radius-md);
-        padding: 8px 14px;
-        font-weight: 600;
-        font-family: var(--pdf-font-body), Inter, Arial, sans-serif;
-      }
-      .preview-btn.primary {
-        background: var(--pdf-primary);
-        color: #ffffff;
-      }
-      .preview-btn.secondary {
-        background: var(--pdf-surface);
-        color: var(--pdf-text-dark);
-        border: 1px solid #b5c1cf;
-      }
-      .preview-input {
-        min-width: 180px;
-        padding: 8px 10px;
-        border-radius: var(--pdf-radius-md);
-        border: 1px solid #b5c1cf;
-        color: var(--pdf-text-main);
+      .swatch-item strong {
         font-size: 12px;
       }
     </style>
-  </head>
-  <body>
-    <section class="pdf-page">
-      <header class="pdf-header">
-        <p class="pdf-kicker">StyleGuider | Stilbeschreibung</p>
-        <h1>${escapeHtml(styleObj.style_family.name)}</h1>
-        <p class="pdf-meta">Exportdatum: ${escapeHtml(exportDate)} | Fokuskanal: ${escapeHtml(channelData.label)}</p>
-      </header>
+    <div class="pdf-sheet">
+      <h1 class="pdf-headline">${escapeHtml(styleObj.style_family.name)}</h1>
+      <p class="pdf-meta">Seite 1 von 2 · Stilbeschreibung und Spezifikationen · ${escapeHtml(channelData.label)} · ${escapeHtml(exportDate)}</p>
       <div class="pdf-grid">
         <article class="pdf-card full">
-          <h2>Kurzbeschreibung</h2>
+          <h3>Kurzbeschreibung</h3>
           <p>${escapeHtml(styleObj.style_family.summary || info.effect)}</p>
         </article>
         <article class="pdf-card full">
-          <h2>Wirkung</h2>
+          <h3>Wirkung</h3>
           <p>${escapeHtml(info.effect)}</p>
         </article>
         <article class="pdf-card">
-          <h2>Geeignet für</h2>
+          <h3>Geeignet für</h3>
           <p>${escapeHtml(info.suitable)}</p>
         </article>
         <article class="pdf-card">
-          <h2>Weniger geeignet für</h2>
+          <h3>Weniger geeignet für</h3>
           <p>${escapeHtml(info.avoid)}</p>
         </article>
         <article class="pdf-card">
-          <h2>Empfohlen</h2>
+          <h3>Empfohlen</h3>
           <p>${escapeHtml(info.dos)}</p>
         </article>
         <article class="pdf-card">
-          <h2>Vermeiden</h2>
+          <h3>Vermeiden</h3>
           <p>${escapeHtml(info.donts)}</p>
         </article>
         <article class="pdf-card">
-          <h2>Hinweise Web</h2>
+          <h3>Hinweise Web</h3>
           <p>${escapeHtml(info.web)}</p>
         </article>
         <article class="pdf-card">
-          <h2>Hinweise Print</h2>
+          <h3>Hinweise Print</h3>
           <p>${escapeHtml(info.print)}</p>
         </article>
         <article class="pdf-card full">
-          <h2>Typische Gefahr</h2>
+          <h3>Typische Gefahr</h3>
           <p>${escapeHtml(info.risk)}</p>
         </article>
-      </div>
-    </section>
-
-    <section class="pdf-page">
-      <header class="pdf-header">
-        <p class="pdf-kicker">StyleGuider | Spezifikationen</p>
-        <h1>${escapeHtml(styleObj.style_family.name)} - ${escapeHtml(channelData.label)}</h1>
-        <p class="pdf-meta">Seite 2 enthält die Spezifikationen für den gewählten Kanal.</p>
-      </header>
-      <div class="pdf-grid">
         <article class="pdf-card">
-          <h2>${escapeHtml(channelData.rulesTitle)}</h2>
+          <h3>${escapeHtml(channelData.rulesTitle)}</h3>
           ${objectListHtml(channelData.rules)}
         </article>
         <article class="pdf-card">
-          <h2>${escapeHtml(channelData.templateTitle)}</h2>
+          <h3>${escapeHtml(channelData.templateTitle)}</h3>
           ${objectListHtml(channelData.template)}
         </article>
         <article class="pdf-card full">
-          <h2>Aktuelle Attribute (Live-Zustand)</h2>
-          ${objectListHtml(liveTokenMap)}
+          <h3>Aktive Exporte im Bundle</h3>
+          <p>${escapeHtml(enabledBundleItems || 'Keine Angabe')}</p>
         </article>
         <article class="pdf-card full">
-          <h2>Visuelle Vorschau mit Live-Attributen</h2>
+          <h3>Farben im aktuellen Attribut-Stand</h3>
           <div class="swatch-grid">${colorSwatches}</div>
-          <div class="type-preview">
-            <h3>Typografie Vorschau</h3>
-            <p>Zwölf Boxkämpfer jagen Eva quer durch Sylt. Lesbarkeit und Tonalität entsprechen den gewählten Attributen.</p>
-          </div>
-          <div class="component-row">
-            <button class="preview-btn primary" type="button">Primäre Aktion</button>
-            <button class="preview-btn secondary" type="button">Sekundär</button>
-            <input class="preview-input" type="text" value="Eingabe-Beispiel" />
-          </div>
         </article>
-        <article class="pdf-card">
-          <h2>Governance</h2>
+        <article class="pdf-card full">
+          <h3>Governance</h3>
           ${objectListHtml(governanceMap)}
         </article>
-        <article class="pdf-card">
-          <h2>Aktive Exporte im Bundle</h2>
-          <p>${escapeHtml(enabledBundleItems || 'Keine Angabe')}</p>
-          <p class="pdf-note">Hinweis: Die Bundle-Angaben stammen aus der Stildefinition und ergänzen die Live-Attribute.</p>
+        <article class="pdf-card full">
+          <h3>Aktuelle Attribute</h3>
+          ${objectListHtml(liveTokenMap)}
         </article>
       </div>
-    </section>
-  </body>
-</html>`;
+    </div>
+  `;
+
+  return page;
 }
 
-function exportStylePdf(targetChannel) {
+function buildPdfPreviewPage(targetChannel) {
+  const sourcePreview = document.getElementById('preview-canvas');
+  if (!sourcePreview) return null;
+
+  const page = document.createElement('section');
+  page.style.cssText = 'width: 1200px; padding: 24px; background: #ffffff;';
+  page.innerHTML = `
+    <style>
+      .pdf-preview-wrap {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+      .pdf-preview-head {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 14px;
+        background: #f6f8fb;
+        color: #1f2e3b;
+      }
+      .pdf-preview-slot .preview-canvas {
+        min-height: auto;
+        height: auto;
+        max-height: none;
+        overflow: visible;
+        border: 0;
+        border-radius: 0;
+      }
+      .pdf-preview-slot .preview-canvas.channel-print .sg-container {
+        transform: none;
+      }
+    </style>
+    <div class="pdf-preview-wrap">
+      <div class="pdf-preview-head">Seite 2 von 2 · Live-Vorschau im App-Look (${escapeHtml(
+        targetChannel === 'print' ? 'Print' : 'Web'
+      )})</div>
+      <div class="pdf-preview-slot"></div>
+    </div>
+  `;
+
+  const previewClone = sourcePreview.cloneNode(true);
+  previewClone.id = 'pdf-preview-clone';
+  previewClone.classList.toggle('channel-web', targetChannel === 'web');
+  previewClone.classList.toggle('channel-print', targetChannel === 'print');
+  previewClone.style.minHeight = 'auto';
+  previewClone.style.maxHeight = 'none';
+  previewClone.style.overflow = 'visible';
+
+  const clonedContainer = previewClone.querySelector('.sg-container');
+  if (clonedContainer && targetChannel === 'print') {
+    clonedContainer.style.transform = 'none';
+    clonedContainer.style.margin = '0 auto';
+  }
+
+  const slot = page.querySelector('.pdf-preview-slot');
+  if (slot) slot.appendChild(previewClone);
+  return page;
+}
+
+function createPdfRenderHost() {
+  const host = document.createElement('div');
+  host.style.position = 'fixed';
+  host.style.left = '-300vw';
+  host.style.top = '0';
+  host.style.width = '1400px';
+  host.style.pointerEvents = 'none';
+  host.style.zIndex = '-1';
+  document.body.appendChild(host);
+  return host;
+}
+
+async function captureElementCanvas(element) {
+  if (document.fonts?.ready) {
+    await document.fonts.ready;
+  }
+
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+  return html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    windowWidth: Math.ceil(element.scrollWidth),
+    windowHeight: Math.ceil(element.scrollHeight),
+    scrollX: 0,
+    scrollY: 0
+  });
+}
+
+function addCanvasPageToPdf(pdf, canvas, addNewPage = false) {
+  if (addNewPage) pdf.addPage();
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const margin = 8;
+  const maxWidth = pageWidth - margin * 2;
+  const maxHeight = pageHeight - margin * 2;
+  const ratio = Math.min(maxWidth / canvas.width, maxHeight / canvas.height);
+  const renderWidth = canvas.width * ratio;
+  const renderHeight = canvas.height * ratio;
+  const x = (pageWidth - renderWidth) / 2;
+  const y = (pageHeight - renderHeight) / 2;
+
+  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, renderWidth, renderHeight, undefined, 'FAST');
+}
+
+async function savePdfBlob(blob, fileName) {
+  if ('showSaveFilePicker' in window) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: fileName,
+        startIn: 'downloads',
+        types: [{ description: 'PDF', accept: { 'application/pdf': ['.pdf'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(blob);
+      await writable.close();
+      return;
+    } catch (err) {
+      if (err?.name === 'AbortError') return;
+      console.warn('showSaveFilePicker fehlgeschlagen, fallback auf Download.', err);
+    }
+  }
+
+  const blobUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = blobUrl;
+  anchor.download = fileName;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(blobUrl), 2500);
+}
+
+async function exportStylePdf(targetChannel) {
+  let renderHost = null;
   try {
     const currentStyleObj = findStyleById(currentStyleId);
     if (!currentStyleObj) return;
 
-    const markup = buildPdfExportMarkup(currentStyleObj, targetChannel);
-    const printFrame = document.createElement('iframe');
-    printFrame.setAttribute('aria-hidden', 'true');
-    printFrame.style.position = 'fixed';
-    printFrame.style.right = '0';
-    printFrame.style.bottom = '0';
-    printFrame.style.width = '0';
-    printFrame.style.height = '0';
-    printFrame.style.border = '0';
-    document.body.appendChild(printFrame);
+    closeModal();
 
-    let printed = false;
-    const triggerPrint = () => {
-      if (printed) return;
-      printed = true;
-      const frameWindow = printFrame.contentWindow;
-      if (!frameWindow) return;
-      frameWindow.focus();
-      frameWindow.print();
-      setTimeout(() => {
-        printFrame.remove();
-      }, 1500);
-    };
+    renderHost = createPdfRenderHost();
+    const descriptionPage = buildPdfDescriptionPage(currentStyleObj, targetChannel);
+    const previewPage = buildPdfPreviewPage(targetChannel);
+    renderHost.appendChild(descriptionPage);
+    if (previewPage) renderHost.appendChild(previewPage);
 
-    const frameDocument = printFrame.contentDocument;
-    if (!frameDocument) {
-      printFrame.remove();
-      alert('PDF Export konnte nicht vorbereitet werden.');
-      return;
-    }
+    const descriptionCanvas = await captureElementCanvas(descriptionPage);
+    const previewCanvas = previewPage ? await captureElementCanvas(previewPage) : descriptionCanvas;
+    renderHost.remove();
+    renderHost = null;
 
-    printFrame.addEventListener('load', () => setTimeout(triggerPrint, 100), { once: true });
-    frameDocument.open();
-    frameDocument.write(markup);
-    frameDocument.close();
-    setTimeout(triggerPrint, 600);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+    addCanvasPageToPdf(pdf, descriptionCanvas, false);
+    addCanvasPageToPdf(pdf, previewCanvas, true);
+
+    const fileName = `StyleGuider_${slugifyName(currentStyleObj.style_family.name) || 'stil'}_${targetChannel}_${todayISODate()}.pdf`;
+    await savePdfBlob(pdf.output('blob'), fileName);
   } catch (err) {
-    console.error('PDF Export failed:', err);
+    console.error('PDF Export fehlgeschlagen:', err);
     alert('PDF Export fehlgeschlagen. Bitte versuche es erneut.');
+  } finally {
+    if (renderHost) {
+      renderHost.remove();
+    }
   }
 }
 
@@ -1117,13 +1121,13 @@ function closeModal() {
 }
 
 if (directExportBtn) {
-  directExportBtn.addEventListener('click', () => {
-    exportStylePdf(currentChannel);
-  });
+  directExportBtn.addEventListener('click', openModal);
 }
 
-if (advancedExportBtn) {
-  advancedExportBtn.addEventListener('click', openModal);
+if (pdfSaveBtn) {
+  pdfSaveBtn.addEventListener('click', () => {
+    exportStylePdf(currentChannel);
+  });
 }
 
 closeModalBtn.addEventListener('click', closeModal);
@@ -1143,18 +1147,6 @@ tabBtns.forEach((btn) => {
     document.getElementById(`tab-${e.currentTarget.dataset.tab}`).classList.add('active');
   });
 });
-
-if (exportPdfWebBtn) {
-  exportPdfWebBtn.addEventListener('click', () => {
-    exportStylePdf('web');
-  });
-}
-
-if (exportPdfPrintBtn) {
-  exportPdfPrintBtn.addEventListener('click', () => {
-    exportStylePdf('print');
-  });
-}
 
 copyBtns.forEach((btn) => {
   btn.addEventListener('click', (e) => {
