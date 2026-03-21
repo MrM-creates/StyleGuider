@@ -1006,31 +1006,46 @@ function buildPdfPreviewPage(targetChannel) {
 function createPdfRenderHost() {
   const host = document.createElement('div');
   host.style.position = 'fixed';
-  host.style.left = '-300vw';
+  host.style.left = '0';
   host.style.top = '0';
-  host.style.width = '1400px';
+  host.style.width = '1200px';
+  host.style.maxHeight = '100vh';
+  host.style.overflow = 'hidden';
+  host.style.opacity = '0.01';
   host.style.pointerEvents = 'none';
-  host.style.zIndex = '-1';
+  host.style.zIndex = '0';
   document.body.appendChild(host);
   return host;
 }
 
-async function captureElementCanvas(element) {
+async function captureElementCanvas(element, scaleCandidates = [1.5, 1]) {
   if (document.fonts?.ready) {
     await document.fonts.ready;
   }
 
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-  return html2canvas(element, {
-    scale: 2,
-    useCORS: true,
-    backgroundColor: '#ffffff',
-    windowWidth: Math.ceil(element.scrollWidth),
-    windowHeight: Math.ceil(element.scrollHeight),
-    scrollX: 0,
-    scrollY: 0
-  });
+  let lastError = null;
+  for (const scale of scaleCandidates) {
+    try {
+      return await html2canvas(element, {
+        scale,
+        useCORS: false,
+        allowTaint: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        removeContainer: true,
+        windowWidth: Math.ceil(element.scrollWidth),
+        windowHeight: Math.ceil(element.scrollHeight),
+        scrollX: 0,
+        scrollY: 0
+      });
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  throw lastError || new Error('Canvas Rendering fehlgeschlagen');
 }
 
 function addCanvasPageToPdf(pdf, canvas, addNewPage = false) {
@@ -1090,8 +1105,21 @@ async function exportStylePdf(targetChannel) {
     renderHost.appendChild(descriptionPage);
     if (previewPage) renderHost.appendChild(previewPage);
 
-    const descriptionCanvas = await captureElementCanvas(descriptionPage);
-    const previewCanvas = previewPage ? await captureElementCanvas(previewPage) : descriptionCanvas;
+    const descriptionCanvas = await captureElementCanvas(descriptionPage, [1.5, 1.25, 1]);
+    let previewCanvas = descriptionCanvas;
+
+    if (previewPage) {
+      try {
+        previewCanvas = await captureElementCanvas(previewPage, [1.25, 1, 0.9]);
+      } catch (previewErr) {
+        console.warn('Preview-Rendering fehlgeschlagen, fallback auf Live-Preview.', previewErr);
+        const livePreview = document.getElementById('preview-canvas');
+        if (livePreview) {
+          previewCanvas = await captureElementCanvas(livePreview, [1, 0.85]);
+        }
+      }
+    }
+
     renderHost.remove();
     renderHost = null;
 
