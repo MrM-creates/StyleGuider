@@ -923,6 +923,13 @@ input[type='range'] {
   line-height: 1.5;
 }
 
+.pdf-tab-note {
+  margin: -6px 0 14px;
+  color: #93abc4;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .pdf-export-actions {
   display: grid;
   gap: 10px;

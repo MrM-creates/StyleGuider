@@ -165,7 +165,6 @@ const styleInfoBtn = document.getElementById('style-info-btn');
 const styleInfoCard = document.getElementById('style-info-card');
 
 const infoStyleName = document.getElementById('info-style-name');
-const infoStyleEffect = document.getElementById('info-style-effect');
 const infoStyleSuitable = document.getElementById('info-style-suitable');
 const infoStyleAvoid = document.getElementById('info-style-avoid');
 const infoStyleDos = document.getElementById('info-style-dos');
@@ -309,7 +308,6 @@ function setStyleInfo(styleObj) {
   if (previewStyleSummary) {
     previewStyleSummary.innerText = info.effect;
   }
-  infoStyleEffect.innerText = info.effect;
   infoStyleSuitable.innerText = info.suitable;
   infoStyleAvoid.innerText = info.avoid;
   infoStyleDos.innerText = info.dos;
@@ -947,26 +945,32 @@ function exportStylePdf(targetChannel) {
     const currentStyleObj = findStyleById(currentStyleId);
     if (!currentStyleObj) return;
 
-    const printWindow = window.open('', '_blank', 'noopener,noreferrer,width=1100,height=900');
+    const markup = buildPdfExportMarkup(currentStyleObj, targetChannel);
+    const htmlBlob = new Blob([markup], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(htmlBlob);
+    const printWindow = window.open(blobUrl, '_blank', 'noopener,noreferrer,width=1100,height=900');
+
     if (!printWindow) {
+      URL.revokeObjectURL(blobUrl);
       alert('Bitte Popups erlauben, damit der PDF-Export gestartet werden kann.');
       return;
     }
 
-    const markup = buildPdfExportMarkup(currentStyleObj, targetChannel);
+    const revokeBlobUrl = () => {
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+    };
+
     let printed = false;
     const triggerPrint = () => {
       if (printed) return;
       printed = true;
       printWindow.focus();
       printWindow.print();
+      revokeBlobUrl();
     };
 
-    printWindow.document.open();
-    printWindow.document.write(markup);
-    printWindow.document.close();
     printWindow.addEventListener('load', () => setTimeout(triggerPrint, 120), { once: true });
-    setTimeout(triggerPrint, 800);
+    setTimeout(triggerPrint, 1200);
   } catch (err) {
     console.error('PDF Export failed:', err);
     alert('PDF Export fehlgeschlagen. Bitte versuche es erneut.');
