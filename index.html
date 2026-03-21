@@ -23,18 +23,19 @@
           </div>
 
           <nav class="stepper-nav" aria-label="Schritt-Navigation">
-            <button class="step-btn active" data-step="style" aria-current="step">
-              <span class="step-index">1</span>
-              Stil wählen
-            </button>
-
-            <div class="style-picker-inline">
-              <label for="style-presets-select" class="sr-only">Vorhandenen Stil auswählen</label>
-              <select id="style-presets-select" class="fs-input" aria-describedby="style-help"></select>
-              <p id="style-help" class="control-help">
-                Wähle einen kuratierten Stil als Grundlage.
-              </p>
+            <div class="style-step-row">
+              <button class="step-btn active" data-step="style" aria-current="step">
+                <span class="step-index">1</span>
+                Stil wählen
+              </button>
+              <div class="style-step-select-wrap">
+                <label for="style-presets-select" class="sr-only">Vorhandenen Stil auswählen</label>
+                <select id="style-presets-select" class="fs-input style-step-select" aria-describedby="style-help"></select>
+              </div>
             </div>
+            <p id="style-help" class="control-help">
+              Wähle einen kuratierten Stil als Grundlage.
+            </p>
 
             <button class="step-btn" data-step="tokens">
               <span class="step-index">2</span>
@@ -194,6 +195,7 @@
             <div class="sg-container">
               <div class="sg-header">
                 <h1 id="preview-brand-title">Marke / UI Titel</h1>
+                <p id="preview-style-summary" class="preview-style-summary"></p>
               </div>
 
               <div class="sg-grid">

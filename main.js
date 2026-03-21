@@ -154,6 +154,7 @@ const colorInputs = document.querySelectorAll('input[type="color"]');
 const tokenSelectInputs = document.querySelectorAll('select[data-var]');
 const radiusSlider = document.getElementById('radius-slider');
 const brandTitle = document.getElementById('preview-brand-title');
+const previewStyleSummary = document.getElementById('preview-style-summary');
 const fontHeadingDisplay = document.getElementById('font-family-heading-display');
 const fontBodyDisplay = document.getElementById('font-family-body-display');
 const stepBtns = document.querySelectorAll('.step-btn');
@@ -264,6 +265,9 @@ function setStyleInfo(styleObj) {
   const info = handbookInfoFor(styleObj);
 
   infoStyleName.innerText = styleObj.style_family.name;
+  if (previewStyleSummary) {
+    previewStyleSummary.innerText = info.effect;
+  }
   infoStyleEffect.innerText = info.effect;
   infoStyleSuitable.innerText = info.suitable;
   infoStyleAvoid.innerText = info.avoid;

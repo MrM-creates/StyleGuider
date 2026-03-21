@@ -136,10 +136,19 @@ body {
   border-bottom: 1px solid var(--ui-border);
 }
 
-.style-picker-inline {
+.style-step-row {
   display: grid;
+  grid-template-columns: minmax(130px, auto) 1fr;
   gap: 8px;
-  margin-bottom: 2px;
+  align-items: center;
+}
+
+.style-step-select-wrap {
+  min-width: 0;
+}
+
+.style-step-select {
+  height: 42px;
 }
 
 .step-btn {
@@ -504,6 +513,13 @@ input[type='range'] {
   color: var(--pv-text-dark);
   font-size: clamp(2rem, 3vw, 2.8rem);
   font-family: var(--pv-font-heading);
+}
+
+.preview-style-summary {
+  margin: 0;
+  color: var(--pv-text-main);
+  font-size: 0.98rem;
+  line-height: 1.45;
 }
 
 .sg-header p {
@@ -955,6 +971,10 @@ a:focus-visible {
   .canvas-wrapper {
     padding-left: 12px;
     padding-right: 12px;
+  }
+
+  .style-step-row {
+    grid-template-columns: 1fr;
   }
 
   .sg-container {
