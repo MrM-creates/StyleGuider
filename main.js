@@ -1069,6 +1069,32 @@ function createPdfRenderHost() {
   return host;
 }
 
+function buildPdfPreviewCaptureNode(targetChannel) {
+  const sourcePreview = document.getElementById('preview-canvas');
+  if (!sourcePreview) return null;
+
+  const wrapper = document.createElement('section');
+  wrapper.style.cssText = 'width: 1200px; padding: 24px; background: #ffffff;';
+
+  const previewClone = sourcePreview.cloneNode(true);
+  previewClone.id = 'pdf-preview-capture';
+  previewClone.classList.toggle('channel-web', targetChannel === 'web');
+  previewClone.classList.toggle('channel-print', targetChannel === 'print');
+  previewClone.style.minHeight = 'auto';
+  previewClone.style.maxHeight = 'none';
+  previewClone.style.height = 'auto';
+  previewClone.style.overflow = 'visible';
+
+  const clonedContainer = previewClone.querySelector('.sg-container');
+  if (clonedContainer && targetChannel === 'print') {
+    clonedContainer.style.transform = 'none';
+    clonedContainer.style.margin = '0 auto';
+  }
+
+  wrapper.appendChild(previewClone);
+  return wrapper;
+}
+
 async function captureElementCanvas(element, scaleCandidates = [1.5, 1]) {
   if (document.fonts?.ready) {
     await document.fonts.ready;
@@ -1114,6 +1140,25 @@ function addCanvasPageToPdf(pdf, canvas, addNewPage = false) {
   const y = (pageHeight - renderHeight) / 2;
 
   pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, renderWidth, renderHeight, undefined, 'FAST');
+}
+
+function sliceCanvasIntoTwoPages(canvas) {
+  const firstHeight = Math.ceil(canvas.height / 2);
+  const secondHeight = canvas.height - firstHeight;
+
+  const firstCanvas = document.createElement('canvas');
+  firstCanvas.width = canvas.width;
+  firstCanvas.height = firstHeight;
+  firstCanvas.getContext('2d').drawImage(canvas, 0, 0, canvas.width, firstHeight, 0, 0, canvas.width, firstHeight);
+
+  const secondCanvas = document.createElement('canvas');
+  secondCanvas.width = canvas.width;
+  secondCanvas.height = Math.max(1, secondHeight);
+  secondCanvas
+    .getContext('2d')
+    .drawImage(canvas, 0, firstHeight, canvas.width, Math.max(1, secondHeight), 0, 0, canvas.width, Math.max(1, secondHeight));
+
+  return [firstCanvas, secondCanvas];
 }
 
 function hexToRgb(hexColor, fallback = [255, 255, 255]) {
@@ -1290,28 +1335,17 @@ async function exportStylePdf(targetChannel) {
 
     try {
       renderHost = createPdfRenderHost();
-      const descriptionPage = buildPdfDescriptionPage(currentStyleObj, targetChannel);
-      const previewPage = buildPdfPreviewPage(targetChannel);
-      renderHost.appendChild(descriptionPage);
-      if (previewPage) renderHost.appendChild(previewPage);
-
-      const descriptionCanvas = await captureElementCanvas(descriptionPage, [1.5, 1.25, 1]);
-      let previewCanvas = descriptionCanvas;
-
-      if (previewPage) {
-        try {
-          previewCanvas = await captureElementCanvas(previewPage, [1.25, 1, 0.9]);
-        } catch (previewErr) {
-          console.warn('Preview-Rendering fehlgeschlagen, fallback auf Live-Preview.', previewErr);
-          const livePreview = document.getElementById('preview-canvas');
-          if (livePreview) {
-            previewCanvas = await captureElementCanvas(livePreview, [1, 0.85]);
-          }
-        }
+      const previewCaptureNode = buildPdfPreviewCaptureNode(targetChannel);
+      if (!previewCaptureNode) {
+        throw new Error('Preview-Knoten für PDF konnte nicht erstellt werden.');
       }
+      renderHost.appendChild(previewCaptureNode);
 
-      addCanvasPageToPdf(pdf, descriptionCanvas, false);
-      addCanvasPageToPdf(pdf, previewCanvas, true);
+      const fullPreviewCanvas = await captureElementCanvas(previewCaptureNode, [1.7, 1.4, 1.15, 1]);
+      const [pageOneCanvas, pageTwoCanvas] = sliceCanvasIntoTwoPages(fullPreviewCanvas);
+
+      addCanvasPageToPdf(pdf, pageOneCanvas, false);
+      addCanvasPageToPdf(pdf, pageTwoCanvas, true);
       renderedFromCanvas = true;
     } catch (renderErr) {
       console.warn('Canvas-PDF fehlgeschlagen, nutze Stabilmodus.', renderErr);
