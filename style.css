@@ -873,7 +873,7 @@ input[type='range'] {
 
 .modal-tabs {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   border-bottom: 1px solid #263445;
 }
 
@@ -931,6 +931,16 @@ input[type='range'] {
   font-size: 0.74rem;
   padding: 6px 10px;
   cursor: pointer;
+}
+
+.delete-style-btn {
+  color: #8f2a2a;
+}
+
+.delete-style-btn:disabled {
+  color: var(--ui-text-muted);
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .sr-only {

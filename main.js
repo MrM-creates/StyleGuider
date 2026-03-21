@@ -177,6 +177,7 @@ const infoStyleRisk = document.getElementById('info-style-risk');
 
 const newStyleNameInput = document.getElementById('new-style-name');
 const saveStyleBtn = document.getElementById('save-style-btn');
+const deleteStyleBtn = document.getElementById('delete-style-btn');
 const saveStyleFeedback = document.getElementById('save-style-feedback');
 const footerYear = document.getElementById('footer-year');
 
@@ -422,6 +423,7 @@ function applyTheme(themeId) {
 
   setStyleInfo(styleObj);
   updateShadowLabels();
+  updateDeleteStyleButtonState();
 }
 
 function applyChannel(channelId) {
@@ -459,6 +461,17 @@ function setSaveStyleFeedback(message, kind = 'neutral') {
   saveStyleFeedback.classList.remove('success', 'error');
   if (kind === 'success') saveStyleFeedback.classList.add('success');
   if (kind === 'error') saveStyleFeedback.classList.add('error');
+}
+
+function isCustomStyleId(styleId) {
+  return customStyles.some((styleObj) => styleObj.style_family.id === styleId);
+}
+
+function updateDeleteStyleButtonState() {
+  if (!deleteStyleBtn) return;
+  const canDelete = isCustomStyleId(currentStyleId);
+  deleteStyleBtn.disabled = !canDelete;
+  deleteStyleBtn.title = canDelete ? 'Eigenen Stil löschen' : 'Nur eigene Stile können gelöscht werden';
 }
 
 function saveAsCustomStyle() {
@@ -527,6 +540,30 @@ function saveAsCustomStyle() {
 
   newStyleNameInput.value = '';
   setSaveStyleFeedback('Neuer Stil wurde gespeichert und zur Auswahl hinzugefügt.', 'success');
+  updateDeleteStyleButtonState();
+}
+
+function deleteCurrentCustomStyle() {
+  if (!isCustomStyleId(currentStyleId)) {
+    setSaveStyleFeedback('Nur selbst erstellte Stile können gelöscht werden.', 'error');
+    updateDeleteStyleButtonState();
+    return;
+  }
+
+  const styleToDelete = findStyleById(currentStyleId);
+  const styleName = styleToDelete?.style_family?.name || currentStyleId;
+  const confirmed = window.confirm(`Möchtest du den Stil "${styleName}" wirklich löschen?`);
+  if (!confirmed) return;
+
+  customStyles = customStyles.filter((styleObj) => styleObj.style_family.id !== currentStyleId);
+  persistCustomStyles();
+
+  const fallbackStyleId = STYLES[0]?.style_family?.id || '';
+  buildStyleSelect(fallbackStyleId);
+  applyTheme(fallbackStyleId);
+
+  setSaveStyleFeedback(`Stil "${styleName}" wurde gelöscht.`, 'success');
+  updateDeleteStyleButtonState();
 }
 
 function initUI() {
@@ -589,9 +626,14 @@ function initUI() {
     saveStyleBtn.addEventListener('click', saveAsCustomStyle);
   }
 
+  if (deleteStyleBtn) {
+    deleteStyleBtn.addEventListener('click', deleteCurrentCustomStyle);
+  }
+
   applyTheme(currentStyleId);
   applyChannel('web');
   setStep(currentStep);
+  updateDeleteStyleButtonState();
 }
 
 initUI();
@@ -701,6 +743,15 @@ RULES:
 AVOID:
 - ${(currentStyleObj.donts || []).join('\n- ')}`;
     document.getElementById('export-ai-code').innerText = aiPrompt;
+
+    const mood = (currentStyleObj.style_family?.brand_keywords || []).join(', ');
+    const imagePrompt = `/imagine prompt: High-end layout design element, website photography or print flyer photography depending on context, vector illustration style.
+Mood: ${mood}.
+Color Palette: ${live.background}, ${live.primary}, ${live.surface}.
+Aesthetic: clean lines, modern web design, highly detailed, 8k resolution, dribbble style --ar ${
+      currentChannel === 'web' ? '16:9' : '3:4'
+    } --v 6.0`;
+    document.getElementById('export-image-code').innerText = imagePrompt;
   } catch (err) {
     console.error('Export Generator failed:', err);
     alert('Export fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.');
@@ -1065,6 +1116,61 @@ function addCanvasPageToPdf(pdf, canvas, addNewPage = false) {
   pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, renderWidth, renderHeight, undefined, 'FAST');
 }
 
+function addSimplePdfFallback(pdf, styleObj, targetChannel) {
+  const info = handbookInfoFor(styleObj);
+  const channelData = getChannelSpecData(styleObj, targetChannel);
+  const live = getLiveExportTokens();
+
+  const writeBlock = (title, text, startY) => {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(11);
+    pdf.text(title, 12, startY);
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(10);
+    const lines = pdf.splitTextToSize(text || 'Keine Angabe', pageWidth - 24);
+    pdf.text(lines, 12, startY + 5);
+    return startY + 8 + lines.length * 4.2;
+  };
+
+  let y = 14;
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(17);
+  pdf.text(styleObj.style_family.name, 12, y);
+  y += 7;
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.text(`Seite 1 von 2 · ${channelData.label}`, 12, y);
+  y += 8;
+
+  y = writeBlock('Kurzbeschreibung', styleObj.style_family.summary || info.effect, y);
+  y = writeBlock('Wirkung', info.effect, y);
+  y = writeBlock('Geeignet für', info.suitable, y);
+  y = writeBlock('Weniger geeignet für', info.avoid, y);
+  y = writeBlock('Empfohlen', info.dos, y);
+  y = writeBlock('Vermeiden', info.donts, y);
+  y = writeBlock('Hinweise Web', info.web, y);
+  y = writeBlock('Hinweise Print', info.print, y);
+  writeBlock('Typische Gefahr', info.risk, y);
+
+  pdf.addPage();
+  y = 14;
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(17);
+  pdf.text(`${styleObj.style_family.name} · Live-Attribute`, 12, y);
+  y += 7;
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(10);
+  pdf.text('Seite 2 von 2 · Stabilmodus', 12, y);
+  y += 8;
+
+  y = writeBlock(channelData.rulesTitle, formatSpecValue(channelData.rules), y);
+  y = writeBlock(channelData.templateTitle, formatSpecValue(channelData.template), y);
+  y = writeBlock('Farben', `Hintergrund ${live.background}, Fläche ${live.surface}, Primär ${live.primary}, Akzent ${live.accent}`, y);
+  y = writeBlock('Typografie', `Überschrift ${live.heading_font}, Fließtext ${live.body_font}`, y);
+  writeBlock('Formen', `Radius sm ${live.radius_sm}, md ${live.radius_md}, lg ${live.radius_lg}, pill ${live.radius_pill}`, y);
+}
+
 async function savePdfBlob(blob, fileName) {
   if ('showSaveFilePicker' in window) {
     try {
@@ -1087,7 +1193,9 @@ async function savePdfBlob(blob, fileName) {
   const anchor = document.createElement('a');
   anchor.href = blobUrl;
   anchor.download = fileName;
+  document.body.appendChild(anchor);
   anchor.click();
+  anchor.remove();
   setTimeout(() => URL.revokeObjectURL(blobUrl), 2500);
 }
 
@@ -1099,36 +1207,49 @@ async function exportStylePdf(targetChannel) {
 
     closeModal();
 
-    renderHost = createPdfRenderHost();
-    const descriptionPage = buildPdfDescriptionPage(currentStyleObj, targetChannel);
-    const previewPage = buildPdfPreviewPage(targetChannel);
-    renderHost.appendChild(descriptionPage);
-    if (previewPage) renderHost.appendChild(previewPage);
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+    let renderedFromCanvas = false;
 
-    const descriptionCanvas = await captureElementCanvas(descriptionPage, [1.5, 1.25, 1]);
-    let previewCanvas = descriptionCanvas;
+    try {
+      renderHost = createPdfRenderHost();
+      const descriptionPage = buildPdfDescriptionPage(currentStyleObj, targetChannel);
+      const previewPage = buildPdfPreviewPage(targetChannel);
+      renderHost.appendChild(descriptionPage);
+      if (previewPage) renderHost.appendChild(previewPage);
 
-    if (previewPage) {
-      try {
-        previewCanvas = await captureElementCanvas(previewPage, [1.25, 1, 0.9]);
-      } catch (previewErr) {
-        console.warn('Preview-Rendering fehlgeschlagen, fallback auf Live-Preview.', previewErr);
-        const livePreview = document.getElementById('preview-canvas');
-        if (livePreview) {
-          previewCanvas = await captureElementCanvas(livePreview, [1, 0.85]);
+      const descriptionCanvas = await captureElementCanvas(descriptionPage, [1.5, 1.25, 1]);
+      let previewCanvas = descriptionCanvas;
+
+      if (previewPage) {
+        try {
+          previewCanvas = await captureElementCanvas(previewPage, [1.25, 1, 0.9]);
+        } catch (previewErr) {
+          console.warn('Preview-Rendering fehlgeschlagen, fallback auf Live-Preview.', previewErr);
+          const livePreview = document.getElementById('preview-canvas');
+          if (livePreview) {
+            previewCanvas = await captureElementCanvas(livePreview, [1, 0.85]);
+          }
         }
+      }
+
+      addCanvasPageToPdf(pdf, descriptionCanvas, false);
+      addCanvasPageToPdf(pdf, previewCanvas, true);
+      renderedFromCanvas = true;
+    } catch (renderErr) {
+      console.warn('Canvas-PDF fehlgeschlagen, nutze Stabilmodus.', renderErr);
+      addSimplePdfFallback(pdf, currentStyleObj, targetChannel);
+    } finally {
+      if (renderHost) {
+        renderHost.remove();
+        renderHost = null;
       }
     }
 
-    renderHost.remove();
-    renderHost = null;
-
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
-    addCanvasPageToPdf(pdf, descriptionCanvas, false);
-    addCanvasPageToPdf(pdf, previewCanvas, true);
-
     const fileName = `StyleGuider_${slugifyName(currentStyleObj.style_family.name) || 'stil'}_${targetChannel}_${todayISODate()}.pdf`;
     await savePdfBlob(pdf.output('blob'), fileName);
+    if (!renderedFromCanvas) {
+      setSaveStyleFeedback('PDF im Stabilmodus erstellt (reduzierte Darstellung).', 'neutral');
+    }
   } catch (err) {
     console.error('PDF Export fehlgeschlagen:', err);
     alert('PDF Export fehlgeschlagen. Bitte versuche es erneut.');
