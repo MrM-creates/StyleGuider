@@ -1354,6 +1354,25 @@ function collectPrintCssVariableMap() {
     .filter(([, value]) => Boolean(value));
 }
 
+function collectActiveStylesheetMarkup() {
+  const linkMarkup = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+    .map((link) => {
+      const href = link.href ? escapeHtmlAttribute(link.href) : '';
+      if (!href) return '';
+      const media = link.media ? ` media="${escapeHtmlAttribute(link.media)}"` : '';
+      const crossorigin = link.crossOrigin ? ' crossorigin' : '';
+      return `<link rel="stylesheet" href="${href}"${media}${crossorigin} />`;
+    })
+    .filter(Boolean)
+    .join('\n');
+
+  const inlineStyleMarkup = Array.from(document.querySelectorAll('style'))
+    .map((styleTag) => `<style>${styleTag.textContent || ''}</style>`)
+    .join('\n');
+
+  return `${linkMarkup}\n${inlineStyleMarkup}`;
+}
+
 function sanitizePreviewCloneForPrint(previewClone, { showInfoCard = false } = {}) {
   if (!previewClone) return;
   previewClone.querySelectorAll('.sg-header .info-btn').forEach((btn) => btn.remove());
@@ -1404,7 +1423,7 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
 
   const fileNameBase = `StyleGuider_${slugifyName(currentStyleObj.style_family.name) || 'stil'}_${targetChannel}_${todayISODate()}`;
   const safeTitle = escapeHtmlAttribute(fileNameBase);
-  const styleHref = escapeHtmlAttribute(new URL('style.css', window.location.href).href);
+  const stylesheetMarkup = collectActiveStylesheetMarkup();
   const cssVariableRules = collectPrintCssVariableMap()
     .map(([name, value]) => `${name}: ${value};`)
     .join('\n');
@@ -1417,7 +1436,7 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>${safeTitle}</title>
-        <link rel="stylesheet" href="${styleHref}" />
+        ${stylesheetMarkup}
         <style>
           :root {
             ${cssVariableRules}
