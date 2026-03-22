@@ -1305,6 +1305,197 @@ function addSimplePdfFallback(pdf, styleObj, targetChannel) {
   );
 }
 
+function escapeHtmlAttribute(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function collectPrintCssVariableMap() {
+  const variableNames = [
+    '--ui-bg',
+    '--ui-surface',
+    '--ui-surface-muted',
+    '--ui-border',
+    '--ui-text',
+    '--ui-text-muted',
+    '--ui-accent',
+    '--ui-accent-hover',
+    '--ui-accent-soft',
+    '--ui-success',
+    '--ui-radius-sm',
+    '--ui-radius-md',
+    '--ui-radius-lg',
+    '--ui-shadow',
+    '--pv-bg-main',
+    '--pv-surface',
+    '--pv-text-dark',
+    '--pv-text-main',
+    '--pv-text-light',
+    '--pv-color-1',
+    '--pv-color-2',
+    '--pv-color-1-soft',
+    '--pv-font-heading',
+    '--pv-font-body',
+    '--pv-radius-sm',
+    '--pv-radius-md',
+    '--pv-radius-lg',
+    '--pv-radius-pill',
+    '--pv-shadow-soft',
+    '--pv-shadow-card',
+    '--pv-shadow-hover'
+  ];
+
+  const computed = getComputedStyle(document.documentElement);
+  return variableNames
+    .map((name) => [name, computed.getPropertyValue(name).trim()])
+    .filter(([, value]) => Boolean(value));
+}
+
+function sanitizePreviewCloneForPrint(previewClone, { showInfoCard = false } = {}) {
+  if (!previewClone) return;
+  previewClone.querySelectorAll('.sg-header .info-btn').forEach((btn) => btn.remove());
+  const infoCard = previewClone.querySelector('#style-info-card');
+  if (!infoCard) return;
+  if (showInfoCard) {
+    infoCard.classList.remove('hidden');
+  } else {
+    infoCard.remove();
+  }
+}
+
+function buildPrintSheetMarkup(targetChannel) {
+  const pageOneClone = buildPdfPreviewClone(targetChannel);
+  const pageTwoClone = buildPdfPreviewClone(targetChannel);
+  if (!pageOneClone || !pageTwoClone) return null;
+
+  sanitizePreviewCloneForPrint(pageOneClone, { showInfoCard: true });
+  sanitizePreviewCloneForPrint(pageTwoClone, { showInfoCard: false });
+
+  const pageOneGrid = pageOneClone.querySelector('.sg-grid');
+  if (pageOneGrid) pageOneGrid.remove();
+
+  const pageTwoHeader = pageTwoClone.querySelector('.sg-header');
+  if (pageTwoHeader) pageTwoHeader.remove();
+
+  return `
+    <section class="print-sheet">
+      ${pageOneClone.outerHTML}
+    </section>
+    <section class="print-sheet">
+      ${pageTwoClone.outerHTML}
+    </section>
+  `;
+}
+
+function openBrowserPrintExport(targetChannel, currentStyleObj) {
+  const sheetMarkup = buildPrintSheetMarkup(targetChannel);
+  if (!sheetMarkup) {
+    throw new Error('Druck-Markup für den PDF-Export konnte nicht erstellt werden.');
+  }
+
+  const printWindow = window.open('', '_blank');
+  if (!printWindow) {
+    alert('Bitte Popups erlauben, damit der PDF-Export gestartet werden kann.');
+    return false;
+  }
+
+  const fileNameBase = `StyleGuider_${slugifyName(currentStyleObj.style_family.name) || 'stil'}_${targetChannel}_${todayISODate()}`;
+  const safeTitle = escapeHtmlAttribute(fileNameBase);
+  const styleHref = escapeHtmlAttribute(new URL('style.css', window.location.href).href);
+  const cssVariableRules = collectPrintCssVariableMap()
+    .map(([name, value]) => `${name}: ${value};`)
+    .join('\n');
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!doctype html>
+    <html lang="de">
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>${safeTitle}</title>
+        <link rel="stylesheet" href="${styleHref}" />
+        <style>
+          :root {
+            ${cssVariableRules}
+          }
+          @page {
+            size: A4 portrait;
+            margin: 8mm;
+          }
+          body {
+            margin: 0;
+            background: #ffffff;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          .print-sheet {
+            break-after: page;
+            page-break-after: always;
+          }
+          .print-sheet:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+          .print-sheet .preview-canvas {
+            min-height: auto;
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+          }
+          .print-sheet .sg-container {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 24px;
+            transform: none !important;
+          }
+          @media screen {
+            body {
+              background: #eef2f7;
+              padding: 14px;
+            }
+            .print-sheet {
+              max-width: 1120px;
+              margin: 0 auto 14px;
+              border: 1px solid #d8dee5;
+              border-radius: 12px;
+              overflow: hidden;
+              background: #ffffff;
+            }
+          }
+          @media print {
+            .print-sheet {
+              border: 0;
+              border-radius: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        ${sheetMarkup}
+        <script>
+          window.addEventListener('load', () => {
+            setTimeout(() => {
+              window.focus();
+              window.print();
+            }, 350);
+          });
+          window.addEventListener('afterprint', () => {
+            setTimeout(() => window.close(), 200);
+          });
+        </script>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  return true;
+}
+
 async function savePdfBlob(blob, fileName) {
   if ('showSaveFilePicker' in window) {
     try {
@@ -1334,54 +1525,18 @@ async function savePdfBlob(blob, fileName) {
 }
 
 async function exportStylePdf(targetChannel) {
-  let renderHost = null;
   try {
     const currentStyleObj = findStyleById(currentStyleId);
     if (!currentStyleObj) return;
 
     closeModal();
-
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
-    let renderedFromCanvas = false;
-
-    try {
-      renderHost = createPdfRenderHost();
-      const captureNodes = buildPdfCaptureSectionNodes(targetChannel);
-      if (!captureNodes.length) {
-        throw new Error('Preview-Knoten für PDF konnten nicht erstellt werden.');
-      }
-
-      captureNodes.forEach((node) => renderHost.appendChild(node));
-
-      for (let i = 0; i < captureNodes.length; i += 1) {
-        const node = captureNodes[i];
-        const canvas = await captureElementCanvas(node, pdfScaleCandidatesFor(node));
-        addCanvasPageToPdf(pdf, canvas, i > 0);
-      }
-
-      renderedFromCanvas = true;
-    } catch (renderErr) {
-      console.warn('Canvas-PDF fehlgeschlagen, nutze Stabilmodus.', renderErr);
-      addSimplePdfFallback(pdf, currentStyleObj, targetChannel);
-    } finally {
-      if (renderHost) {
-        renderHost.remove();
-        renderHost = null;
-      }
-    }
-
-    const fileName = `StyleGuider_${slugifyName(currentStyleObj.style_family.name) || 'stil'}_${targetChannel}_${todayISODate()}.pdf`;
-    await savePdfBlob(pdf.output('blob'), fileName);
-    if (!renderedFromCanvas) {
-      setSaveStyleFeedback('PDF im Stabilmodus erstellt (reduzierte Darstellung).', 'neutral');
+    const opened = openBrowserPrintExport(targetChannel, currentStyleObj);
+    if (opened) {
+      setSaveStyleFeedback('Druckdialog geöffnet. Wähle "Als PDF sichern".', 'success');
     }
   } catch (err) {
     console.error('PDF Export fehlgeschlagen:', err);
     alert('PDF Export fehlgeschlagen. Bitte versuche es erneut.');
-  } finally {
-    if (renderHost) {
-      renderHost.remove();
-    }
   }
 }
 
