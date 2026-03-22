@@ -1390,6 +1390,12 @@ function buildPrintSheetMarkup(targetChannel) {
   const pageTwoClone = buildPdfPreviewClone(targetChannel);
   if (!pageOneClone || !pageTwoClone) return null;
 
+  // For PDF printing we always render in full-width preview mode.
+  [pageOneClone, pageTwoClone].forEach((clone) => {
+    clone.classList.remove('channel-print');
+    clone.classList.add('channel-web');
+  });
+
   sanitizePreviewCloneForPrint(pageOneClone, { showInfoCard: true });
   sanitizePreviewCloneForPrint(pageTwoClone, { showInfoCard: false });
 
@@ -1443,7 +1449,7 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
           }
           @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 10mm;
           }
           body {
             margin: 0;
@@ -1452,13 +1458,6 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             print-color-adjust: exact;
           }
           .print-sheet {
-            position: relative;
-            width: 210mm;
-            height: 297mm;
-            min-height: 297mm;
-            overflow: hidden;
-            break-inside: avoid-page;
-            page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
           }
@@ -1468,34 +1467,26 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
           }
           .print-sheet .preview-canvas {
             min-height: auto;
+            width: 100%;
             margin: 0;
             border: 0;
             border-radius: 0;
             box-shadow: none;
-            overflow: hidden;
+            overflow: visible;
+            background: var(--pv-bg-main) !important;
           }
           .print-sheet .sg-container {
             width: 100%;
             max-width: none;
             margin: 0;
-            padding: 16px 18px;
+            padding: 0;
             transform: none !important;
           }
-          .print-sheet .preview-canvas.channel-print {
-            display: block !important;
-            background: var(--pv-bg-main) !important;
-          }
-          .print-sheet .preview-canvas.channel-print .sg-container {
-            width: 100% !important;
-            min-height: 0 !important;
-            margin: 0 !important;
-            padding: 16px 18px !important;
-            transform: none !important;
-            box-shadow: none !important;
-            border-radius: 0 !important;
+          .print-sheet.page-1 .sg-container {
+            padding: 2mm 1mm 0;
           }
           .print-sheet.page-2 .sg-container {
-            padding: 12px 14px;
+            padding: 1mm 1mm 0;
           }
           .print-sheet.page-2 .sg-grid {
             gap: 12px;
@@ -1591,7 +1582,7 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
               margin: 0 auto 14px;
               border: 1px solid #d8dee5;
               border-radius: 12px;
-              overflow: hidden;
+              overflow: visible;
               background: #ffffff;
             }
           }
