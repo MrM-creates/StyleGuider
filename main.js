@@ -1472,6 +1472,7 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             border: 0;
             border-radius: 0;
             box-shadow: none;
+            overflow: hidden;
           }
           .print-sheet .sg-container {
             width: 100%;
@@ -1480,90 +1481,103 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             padding: 16px 18px;
             transform: none !important;
           }
+          .print-sheet .preview-canvas.channel-print {
+            display: block !important;
+            background: var(--pv-bg-main) !important;
+          }
+          .print-sheet .preview-canvas.channel-print .sg-container {
+            width: 100% !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 16px 18px !important;
+            transform: none !important;
+            box-shadow: none !important;
+            border-radius: 0 !important;
+          }
           .print-sheet.page-2 .sg-container {
-            padding: 10px 12px;
+            padding: 12px 14px;
           }
           .print-sheet.page-2 .sg-grid {
-            gap: 10px;
+            gap: 12px;
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
           .print-sheet.page-2 .sg-card {
-            padding: 13px;
+            padding: 15px;
             border-radius: 8px;
           }
           .print-sheet.page-2 .sg-card h2 {
-            margin: 0 0 11px;
-            font-size: 0.78rem;
+            margin: 0 0 13px;
+            font-size: 0.84rem;
             letter-spacing: 0.06em;
           }
           .print-sheet.page-2 .section-explainer {
-            margin: -2px 0 10px;
-            font-size: 0.75rem;
-            line-height: 1.35;
+            margin: -2px 0 12px;
+            font-size: 0.79rem;
+            line-height: 1.4;
           }
           .print-sheet.page-2 .color-row {
-            gap: 10px;
-            margin-bottom: 9px;
+            gap: 11px;
+            margin-bottom: 10px;
           }
           .print-sheet.page-2 .color-swatch {
-            width: 42px;
-            height: 42px;
+            width: 46px;
+            height: 46px;
           }
           .print-sheet.page-2 .color-name {
-            font-size: 0.9rem;
+            font-size: 0.94rem;
           }
           .print-sheet.page-2 .color-hex {
-            font-size: 0.75rem;
+            font-size: 0.78rem;
           }
           .print-sheet.page-2 .type-example {
-            margin-bottom: 12px;
-            padding-bottom: 10px;
+            margin-bottom: 13px;
+            padding-bottom: 11px;
           }
           .print-sheet.page-2 .type-label {
             margin-bottom: 7px;
-            font-size: 0.72rem;
+            font-size: 0.74rem;
           }
           .print-sheet.page-2 .type-showcase h3 {
-            font-size: 0.9rem;
+            font-size: 0.94rem;
             margin-top: 6px;
           }
           .print-sheet.page-2 .type-aa {
-            font-size: 1.9rem;
+            font-size: 2rem;
           }
           .print-sheet.page-2 .btn-group {
-            gap: 8px;
+            gap: 9px;
           }
           .print-sheet.page-2 .btn {
-            padding: 8px 11px;
-            font-size: 0.8rem;
+            padding: 8px 12px;
+            font-size: 0.82rem;
           }
           .print-sheet.page-2 .input-label {
-            margin-top: 12px;
+            margin-top: 13px;
           }
           .print-sheet.page-2 .input-example {
-            padding: 9px;
+            padding: 10px;
             margin-top: 7px;
-            font-size: 0.82rem;
+            font-size: 0.84rem;
           }
           .print-sheet.page-2 .shape-row {
             margin-bottom: 12px;
-            gap: 8px;
+            gap: 9px;
           }
           .print-sheet.page-2 .shadow-row {
-            gap: 8px;
+            gap: 9px;
           }
           .print-sheet.page-2 .shape-box {
-            min-width: 92px;
+            min-width: 96px;
             padding: 8px 10px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
           }
           .print-sheet.page-2 .shadow-box {
-            min-height: 72px;
+            min-height: 76px;
             gap: 4px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
           }
           .print-sheet.page-2 .shadow-val {
-            font-size: 0.62rem;
+            font-size: 0.64rem;
           }
           @media screen {
             body {
