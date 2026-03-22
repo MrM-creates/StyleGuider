@@ -1400,10 +1400,10 @@ function buildPrintSheetMarkup(targetChannel) {
   if (pageTwoHeader) pageTwoHeader.remove();
 
   return `
-    <section class="print-sheet">
+    <section class="print-sheet page-1">
       ${pageOneClone.outerHTML}
     </section>
-    <section class="print-sheet">
+    <section class="print-sheet page-2">
       ${pageTwoClone.outerHTML}
     </section>
   `;
@@ -1443,7 +1443,7 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
           }
           @page {
             size: A4 portrait;
-            margin: 8mm;
+            margin: 0;
           }
           body {
             margin: 0;
@@ -1452,6 +1452,13 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             print-color-adjust: exact;
           }
           .print-sheet {
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            min-height: 297mm;
+            overflow: hidden;
+            break-inside: avoid-page;
+            page-break-inside: avoid;
             break-after: page;
             page-break-after: always;
           }
@@ -1460,6 +1467,8 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             page-break-after: auto;
           }
           .print-sheet .preview-canvas {
+            position: absolute;
+            inset: 0;
             min-height: auto;
             margin: 0;
             border: 0;
@@ -1470,8 +1479,14 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             width: 100%;
             max-width: none;
             margin: 0;
-            padding: 24px;
+            padding: 16px 18px;
             transform: none !important;
+          }
+          .print-sheet.page-2 .preview-canvas {
+            transform-origin: top center;
+            transform: scale(0.92);
+            width: 108.7%;
+            height: 108.7%;
           }
           @media screen {
             body {
@@ -1479,12 +1494,22 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
               padding: 14px;
             }
             .print-sheet {
-              max-width: 1120px;
+              width: min(1120px, 100%);
+              height: auto;
+              min-height: 0;
               margin: 0 auto 14px;
               border: 1px solid #d8dee5;
               border-radius: 12px;
               overflow: hidden;
               background: #ffffff;
+            }
+            .print-sheet .preview-canvas {
+              position: static;
+            }
+            .print-sheet.page-2 .preview-canvas {
+              transform: none;
+              width: auto;
+              height: auto;
             }
           }
           @media print {
