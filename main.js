@@ -1401,14 +1401,10 @@ function buildPrintSheetMarkup(targetChannel) {
 
   return `
     <section class="print-sheet page-1">
-      <div class="print-sheet-fit">
-        ${pageOneClone.outerHTML}
-      </div>
+      ${pageOneClone.outerHTML}
     </section>
     <section class="print-sheet page-2">
-      <div class="print-sheet-fit">
-        ${pageTwoClone.outerHTML}
-      </div>
+      ${pageTwoClone.outerHTML}
     </section>
   `;
 }
@@ -1466,11 +1462,6 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             break-after: page;
             page-break-after: always;
           }
-          .print-sheet-fit {
-            width: 100%;
-            height: auto;
-            transform-origin: top left;
-          }
           .print-sheet:last-child {
             break-after: auto;
             page-break-after: auto;
@@ -1488,6 +1479,91 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             margin: 0;
             padding: 16px 18px;
             transform: none !important;
+          }
+          .print-sheet.page-2 .sg-container {
+            padding: 10px 12px;
+          }
+          .print-sheet.page-2 .sg-grid {
+            gap: 10px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .print-sheet.page-2 .sg-card {
+            padding: 13px;
+            border-radius: 8px;
+          }
+          .print-sheet.page-2 .sg-card h2 {
+            margin: 0 0 11px;
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+          }
+          .print-sheet.page-2 .section-explainer {
+            margin: -2px 0 10px;
+            font-size: 0.75rem;
+            line-height: 1.35;
+          }
+          .print-sheet.page-2 .color-row {
+            gap: 10px;
+            margin-bottom: 9px;
+          }
+          .print-sheet.page-2 .color-swatch {
+            width: 42px;
+            height: 42px;
+          }
+          .print-sheet.page-2 .color-name {
+            font-size: 0.9rem;
+          }
+          .print-sheet.page-2 .color-hex {
+            font-size: 0.75rem;
+          }
+          .print-sheet.page-2 .type-example {
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+          }
+          .print-sheet.page-2 .type-label {
+            margin-bottom: 7px;
+            font-size: 0.72rem;
+          }
+          .print-sheet.page-2 .type-showcase h3 {
+            font-size: 0.9rem;
+            margin-top: 6px;
+          }
+          .print-sheet.page-2 .type-aa {
+            font-size: 1.9rem;
+          }
+          .print-sheet.page-2 .btn-group {
+            gap: 8px;
+          }
+          .print-sheet.page-2 .btn {
+            padding: 8px 11px;
+            font-size: 0.8rem;
+          }
+          .print-sheet.page-2 .input-label {
+            margin-top: 12px;
+          }
+          .print-sheet.page-2 .input-example {
+            padding: 9px;
+            margin-top: 7px;
+            font-size: 0.82rem;
+          }
+          .print-sheet.page-2 .shape-row {
+            margin-bottom: 12px;
+            gap: 8px;
+          }
+          .print-sheet.page-2 .shadow-row {
+            gap: 8px;
+          }
+          .print-sheet.page-2 .shape-box {
+            min-width: 92px;
+            padding: 8px 10px;
+            font-size: 0.78rem;
+          }
+          .print-sheet.page-2 .shadow-box {
+            min-height: 72px;
+            gap: 4px;
+            font-size: 0.78rem;
+          }
+          .print-sheet.page-2 .shadow-val {
+            font-size: 0.62rem;
           }
           @media screen {
             body {
@@ -1516,38 +1592,12 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
       <body>
         ${sheetMarkup}
         <script>
-          const fitSheetsToPage = () => {
-            const sheets = Array.from(document.querySelectorAll('.print-sheet'));
-            sheets.forEach((sheet) => {
-              const fit = sheet.querySelector('.print-sheet-fit');
-              const canvas = sheet.querySelector('.preview-canvas');
-              if (!fit || !canvas) return;
-
-              fit.style.transform = 'none';
-              fit.style.width = '100%';
-
-              const availableW = sheet.clientWidth;
-              const availableH = sheet.clientHeight;
-              const neededW = Math.max(canvas.scrollWidth, canvas.clientWidth);
-              const neededH = Math.max(canvas.scrollHeight, canvas.clientHeight);
-              if (!neededW || !neededH) return;
-
-              const scale = Math.min(1, availableW / neededW, availableH / neededH);
-              if (scale < 0.999) {
-                fit.style.transform = 'scale(' + scale + ')';
-                fit.style.width = (100 / scale) + '%';
-              }
-            });
-          };
-
           window.addEventListener('load', () => {
             const proceed = () => {
-              fitSheetsToPage();
               setTimeout(() => {
-                fitSheetsToPage();
                 window.focus();
                 window.print();
-              }, 250);
+              }, 260);
             };
 
             if (document.fonts && document.fonts.ready) {
