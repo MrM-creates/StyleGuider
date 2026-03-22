@@ -1401,10 +1401,14 @@ function buildPrintSheetMarkup(targetChannel) {
 
   return `
     <section class="print-sheet page-1">
-      ${pageOneClone.outerHTML}
+      <div class="print-sheet-fit">
+        ${pageOneClone.outerHTML}
+      </div>
     </section>
     <section class="print-sheet page-2">
-      ${pageTwoClone.outerHTML}
+      <div class="print-sheet-fit">
+        ${pageTwoClone.outerHTML}
+      </div>
     </section>
   `;
 }
@@ -1462,13 +1466,16 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             break-after: page;
             page-break-after: always;
           }
+          .print-sheet-fit {
+            width: 100%;
+            height: auto;
+            transform-origin: top left;
+          }
           .print-sheet:last-child {
             break-after: auto;
             page-break-after: auto;
           }
           .print-sheet .preview-canvas {
-            position: absolute;
-            inset: 0;
             min-height: auto;
             margin: 0;
             border: 0;
@@ -1481,12 +1488,6 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
             margin: 0;
             padding: 16px 18px;
             transform: none !important;
-          }
-          .print-sheet.page-2 .preview-canvas {
-            transform-origin: top center;
-            transform: scale(0.92);
-            width: 108.7%;
-            height: 108.7%;
           }
           @media screen {
             body {
@@ -1503,14 +1504,6 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
               overflow: hidden;
               background: #ffffff;
             }
-            .print-sheet .preview-canvas {
-              position: static;
-            }
-            .print-sheet.page-2 .preview-canvas {
-              transform: none;
-              width: auto;
-              height: auto;
-            }
           }
           @media print {
             .print-sheet {
@@ -1523,11 +1516,45 @@ function openBrowserPrintExport(targetChannel, currentStyleObj) {
       <body>
         ${sheetMarkup}
         <script>
+          const fitSheetsToPage = () => {
+            const sheets = Array.from(document.querySelectorAll('.print-sheet'));
+            sheets.forEach((sheet) => {
+              const fit = sheet.querySelector('.print-sheet-fit');
+              const canvas = sheet.querySelector('.preview-canvas');
+              if (!fit || !canvas) return;
+
+              fit.style.transform = 'none';
+              fit.style.width = '100%';
+
+              const availableW = sheet.clientWidth;
+              const availableH = sheet.clientHeight;
+              const neededW = Math.max(canvas.scrollWidth, canvas.clientWidth);
+              const neededH = Math.max(canvas.scrollHeight, canvas.clientHeight);
+              if (!neededW || !neededH) return;
+
+              const scale = Math.min(1, availableW / neededW, availableH / neededH);
+              if (scale < 0.999) {
+                fit.style.transform = 'scale(' + scale + ')';
+                fit.style.width = (100 / scale) + '%';
+              }
+            });
+          };
+
           window.addEventListener('load', () => {
-            setTimeout(() => {
-              window.focus();
-              window.print();
-            }, 350);
+            const proceed = () => {
+              fitSheetsToPage();
+              setTimeout(() => {
+                fitSheetsToPage();
+                window.focus();
+                window.print();
+              }, 250);
+            };
+
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(proceed).catch(proceed);
+            } else {
+              proceed();
+            }
           });
           window.addEventListener('afterprint', () => {
             setTimeout(() => window.close(), 200);
