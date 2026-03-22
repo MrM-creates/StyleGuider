@@ -1056,25 +1056,20 @@ function buildPdfPreviewPage(targetChannel) {
 
 function createPdfRenderHost() {
   const host = document.createElement('div');
-  host.style.position = 'fixed';
-  host.style.left = '0';
+  host.style.position = 'absolute';
+  host.style.left = '-9999px';
   host.style.top = '0';
   host.style.width = '1200px';
-  host.style.maxHeight = '100vh';
-  host.style.overflow = 'hidden';
-  host.style.opacity = '0.01';
-  host.style.pointerEvents = 'none';
-  host.style.zIndex = '0';
+  host.style.zIndex = '-1000';
+  // Removed maxHeight and overflow: hidden so html2canvas doesn't clip the render!
+  // Removed opacity: 0.01 which can cause the output to be semi-transparent on some browsers.
   document.body.appendChild(host);
   return host;
 }
 
-function buildPdfPreviewCaptureNode(targetChannel) {
+function buildPdfPreviewClone(targetChannel) {
   const sourcePreview = document.getElementById('preview-canvas');
   if (!sourcePreview) return null;
-
-  const wrapper = document.createElement('section');
-  wrapper.style.cssText = 'width: 1200px; padding: 24px; background: #ffffff;';
 
   const previewClone = sourcePreview.cloneNode(true);
   previewClone.id = 'pdf-preview-capture';
@@ -1091,8 +1086,47 @@ function buildPdfPreviewCaptureNode(targetChannel) {
     clonedContainer.style.margin = '0 auto';
   }
 
+  return previewClone;
+}
+
+function ensurePdfInfoPanelVisible(previewClone) {
+  const infoCard = previewClone?.querySelector('#style-info-card');
+  if (!infoCard) return;
+  infoCard.classList.remove('hidden');
+}
+
+function wrapPreviewCloneForCapture(previewClone) {
+  const wrapper = document.createElement('section');
+  wrapper.style.cssText = 'width: 1200px; padding: 24px; background: #ffffff;';
   wrapper.appendChild(previewClone);
   return wrapper;
+}
+
+function buildPdfCaptureSectionNodes(targetChannel) {
+  const pageOneClone = buildPdfPreviewClone(targetChannel);
+  const pageTwoClone = buildPdfPreviewClone(targetChannel);
+  if (!pageOneClone || !pageTwoClone) return [];
+
+  ensurePdfInfoPanelVisible(pageOneClone);
+  ensurePdfInfoPanelVisible(pageTwoClone);
+
+  const pageOneGrid = pageOneClone.querySelector('.sg-grid');
+  if (pageOneGrid) pageOneGrid.remove();
+
+  const pageTwoHeader = pageTwoClone.querySelector('.sg-header');
+  if (pageTwoHeader) pageTwoHeader.remove();
+
+  return [wrapPreviewCloneForCapture(pageOneClone), wrapPreviewCloneForCapture(pageTwoClone)];
+}
+
+function pdfScaleCandidatesFor(element) {
+  const width = Math.max(1, Math.ceil(element.scrollWidth || element.clientWidth || 1200));
+  const height = Math.max(1, Math.ceil(element.scrollHeight || element.clientHeight || 1600));
+  const area = width * height;
+
+  if (area > 3_800_000) return [1.15, 1, 0.9];
+  if (area > 2_400_000) return [1.35, 1.15, 1];
+  return [1.6, 1.35, 1.15, 1];
 }
 
 async function captureElementCanvas(element, scaleCandidates = [1.5, 1]) {
@@ -1107,15 +1141,11 @@ async function captureElementCanvas(element, scaleCandidates = [1.5, 1]) {
     try {
       return await html2canvas(element, {
         scale,
-        useCORS: false,
-        allowTaint: true,
+        useCORS: true,
+        allowTaint: false, // WICHTIG: Tainted canvases werfen einen Error bei toDataURL()!
         logging: false,
         backgroundColor: '#ffffff',
-        removeContainer: true,
-        windowWidth: Math.ceil(element.scrollWidth),
-        windowHeight: Math.ceil(element.scrollHeight),
-        scrollX: 0,
-        scrollY: 0
+        removeContainer: true
       });
     } catch (err) {
       lastError = err;
@@ -1139,26 +1169,7 @@ function addCanvasPageToPdf(pdf, canvas, addNewPage = false) {
   const x = (pageWidth - renderWidth) / 2;
   const y = (pageHeight - renderHeight) / 2;
 
-  pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, y, renderWidth, renderHeight, undefined, 'FAST');
-}
-
-function sliceCanvasIntoTwoPages(canvas) {
-  const firstHeight = Math.ceil(canvas.height / 2);
-  const secondHeight = canvas.height - firstHeight;
-
-  const firstCanvas = document.createElement('canvas');
-  firstCanvas.width = canvas.width;
-  firstCanvas.height = firstHeight;
-  firstCanvas.getContext('2d').drawImage(canvas, 0, 0, canvas.width, firstHeight, 0, 0, canvas.width, firstHeight);
-
-  const secondCanvas = document.createElement('canvas');
-  secondCanvas.width = canvas.width;
-  secondCanvas.height = Math.max(1, secondHeight);
-  secondCanvas
-    .getContext('2d')
-    .drawImage(canvas, 0, firstHeight, canvas.width, Math.max(1, secondHeight), 0, 0, canvas.width, Math.max(1, secondHeight));
-
-  return [firstCanvas, secondCanvas];
+  pdf.addImage(canvas, 'PNG', x, y, renderWidth, renderHeight, undefined, 'FAST');
 }
 
 function hexToRgb(hexColor, fallback = [255, 255, 255]) {
@@ -1335,17 +1346,19 @@ async function exportStylePdf(targetChannel) {
 
     try {
       renderHost = createPdfRenderHost();
-      const previewCaptureNode = buildPdfPreviewCaptureNode(targetChannel);
-      if (!previewCaptureNode) {
-        throw new Error('Preview-Knoten für PDF konnte nicht erstellt werden.');
+      const captureNodes = buildPdfCaptureSectionNodes(targetChannel);
+      if (!captureNodes.length) {
+        throw new Error('Preview-Knoten für PDF konnten nicht erstellt werden.');
       }
-      renderHost.appendChild(previewCaptureNode);
 
-      const fullPreviewCanvas = await captureElementCanvas(previewCaptureNode, [1.7, 1.4, 1.15, 1]);
-      const [pageOneCanvas, pageTwoCanvas] = sliceCanvasIntoTwoPages(fullPreviewCanvas);
+      captureNodes.forEach((node) => renderHost.appendChild(node));
 
-      addCanvasPageToPdf(pdf, pageOneCanvas, false);
-      addCanvasPageToPdf(pdf, pageTwoCanvas, true);
+      for (let i = 0; i < captureNodes.length; i += 1) {
+        const node = captureNodes[i];
+        const canvas = await captureElementCanvas(node, pdfScaleCandidatesFor(node));
+        addCanvasPageToPdf(pdf, canvas, i > 0);
+      }
+
       renderedFromCanvas = true;
     } catch (renderErr) {
       console.warn('Canvas-PDF fehlgeschlagen, nutze Stabilmodus.', renderErr);
